@@ -47,6 +47,7 @@ class OutputCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* me){
     Serial.println("on output");
     const char* value = me->getValue().c_str();
+    Serial.println(value);
     displayStatus(value);
   }
 };
