@@ -34,7 +34,7 @@ const KEYMAP m5keymap[194]={
     {0,0},
     {0,0},
     {0,0},
-    {0x2c, 0},          /*   32*/
+    {0x2c, 0},          /* space  32*/
     {0x1e, KEY_SHIFT},      /* ! */
     {0x34, KEY_SHIFT},      /* " */
     {0x20, KEY_SHIFT},      /* # */
@@ -190,7 +190,7 @@ const KEYMAP m5keymap[194]={
     {0,0},
     {0x2b, 0}, /*tab */
     {0x4a, 0},/*home */
-    {0,0}, /*end */
+    {0x4d,0}, /*end */
     {0x4b, 0},/*pu */
     {0x4e, 0},/*pd */
     {0x50, 0},/*left */
