@@ -13,7 +13,6 @@
 #include "BLE2902.h"
 #include "BLEHIDDevice.h"
 #include "HIDKeyboardTypes.h"
-#include "M5KeyboardType.h"
 
 class OutputCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* me);
@@ -36,7 +35,7 @@ public:
     void setString(const char *text);
     void setKeys(const KEYMAP *payload, int length);
     void run(void*);
-}
+};
 
 class BLEServerTask:public Task {
 public:
@@ -44,4 +43,3 @@ public:
 };
 
 #endif
-

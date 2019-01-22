@@ -5,9 +5,13 @@
 
 #include <M5Stack.h>
 #include "BLEHIDKeyboard.h"
+#include "M5KeyboardType.h"
+#include "SDCard.h"
 
 #define KEYBOARD_I2C_ADDR     0X08
 #define KEYBOARD_INT          5
+extern bool isConnected;
+extern std::vector<InputTask *> inputtasks;
 
 BLEServerTask* bleservertask = NULL;
 
@@ -17,6 +21,10 @@ void StartBLEServer(void)
   bleservertask->setStackSize(20000);
   bleservertask->start();
 }
+
+void (*funcarr[])()={
+  SDCard::mount
+  };
 
 void setup() {
   M5.begin();                   // M5STACK INITIALIZE
@@ -35,18 +43,20 @@ void loop() {
   if(M5.BtnA.wasPressed()) {
     InputTask *task = new InputTask("Hello From M5Stack!\n");
     task->start();
-    InputTask::inputtasks.push_back(task);
+    inputtasks.push_back(task);
   }
 
   if(M5.BtnB.wasPressed()) {
     KEYMAP payload[1];
-    payload[0] = {0x4c, KEY_CTRL | KEY_ALT}; // CTRL+ALT+DEL !!!!
+//    payload[0] = {0x4c, KEY_CTRL | KEY_ALT}; // CTRL+ALT+DEL !!!!
+    payload[0] = {0x2c, KEY_CTRL}; 
     InputTask *task = new InputTask(payload, 1);
     task->start();
   }
   
   if (M5.BtnC.wasPressed()) {
     Serial.println("btn c");
+    funcarr[0]();
   }
 
   if(digitalRead(KEYBOARD_INT) == LOW) {
