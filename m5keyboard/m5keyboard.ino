@@ -16,16 +16,16 @@ extern bool isConnected;
 extern void StartBLEServer();
 extern void inputKeyValue(int key_val);
 
-int menuindex=0;
-int menulen=3;
+int menuindex= 0;
+int menulen= 3;
 
-const char* menuname[menulen]={
+const char* menuname[3]={
     "start BLE",
     "mount SD",
     "halt"
-}
+};
 
-void (*funcarr[menulen])()={
+void (*funcarr[3])()={
   StartBLEServer,
   SDCard::mount,
   Util::halt
@@ -44,7 +44,7 @@ void setup() {
 
 void loop() {
   if(M5.BtnA.wasPressed()) {
-    Serial.println("exec "+menuname[menuindex]);
+    Serial.println(menuname[menuindex]);
     funcarr[menuindex]();
   }
 
@@ -62,7 +62,7 @@ void loop() {
     payload[0] = {0x2c, KEY_CTRL | KEY_ALT};
     Serial.println(payload[0].usage);
     Serial.println(payload[0].modifier);
-    MyTask *task = new MyTask(payload, 1);
+    InputTask *task = new InputTask(payload, 1);
     task->start();
   }
 

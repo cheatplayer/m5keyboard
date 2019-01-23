@@ -2,20 +2,23 @@
     2019/1/22 by cp
 */
 #include <M5Stack.h>
+#include "SDCard.h"
+
+bool isMounted=false;
 
 void SDCard::displaySDStatus()
 {
-  if(SDCard::isMounted){
-    M5.Lcd.fillCircle(10,230,3,GREEN);
+  if(isMounted){
+    M5.Lcd.fillCircle(20,230,3,GREEN);
   }else{
-    M5.Lcd.fillCircle(10,230,3,RED);
+    M5.Lcd.fillCircle(20,230,3,RED);
   }
 }
 
 void SDCard::mount(){
     if(!SD.begin(4)){
         Serial.println("Card Mount Failed");
-        SDCard::isMounted=false;
+        isMounted=false;
         SDCard::displaySDStatus();
         return;
     }
@@ -40,7 +43,7 @@ void SDCard::mount(){
 
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
-    SDCard::isMounted=true;
+    isMounted=true;
     SDCard::displaySDStatus();
 }
 
@@ -49,7 +52,7 @@ void SDCard::ls(const char *path){
 }
 
 bool SDCard::mkdir(const char *path){
-    if(SDCard.isMounted&&SD.mkdir(path)){
+    if(isMounted&&SD.mkdir(path)){
         return true;
     }else{
         return false;
@@ -57,7 +60,7 @@ bool SDCard::mkdir(const char *path){
 }
 
 bool SDCard::rmdir(const char *path){
-    if(SDCard.isMounted&&SD.rmdir){
+    if(isMounted&&SD.rmdir(path)){
         return true;
     }else{
         return false;
@@ -65,23 +68,24 @@ bool SDCard::rmdir(const char *path){
 }
 
 std::string SDCard::read(const char *path){
-    if(SDCard.isMounted){
+    if(isMounted){
         File file=SD.open(path);
         if(!file){
             return "";
         }
+        std::string result;
+      while(file.available()){
+          result+=file.read();
+      }
+      file.close();
+      return result;
     }
-    std::string result;
-    while(file.available()){
-        result+=file.read();
-    }
-    file.close();
-    return result;
+
 }
 
 bool SDCard::write(const char *path,const char *message){
     File file = SD.open(path, FILE_WRITE);
-    if(!file||!SDCard.isMounted){
+    if(!file||!isMounted){
         return false;
     }
     if(file.print(message)){
@@ -96,7 +100,7 @@ bool SDCard::write(const char *path,const char *message){
 
 bool SDCard::append(const char *path,const char *message){
     File file = SD.open(path, FILE_APPEND);
-    if(!file||!SDCard::isMounted){
+    if(!file||!isMounted){
         return false;
     }
     if(file.print(message)){
@@ -109,7 +113,7 @@ bool SDCard::append(const char *path,const char *message){
 }
 
 bool SDCard::mv(const char *from,const char *to){
-    if(SDCard::isMounted&&SD.rename(from,to)){
+    if(isMounted&&SD.rename(from,to)){
         return true;
     }else{
         return false;
@@ -117,7 +121,7 @@ bool SDCard::mv(const char *from,const char *to){
 }
 
 bool SDCard::rm(const char *path){
-    if(SDCard::isMounted&&SD.remove(path)){
+    if(isMounted&&SD.remove(path)){
         return true;
     }else{
         return false;

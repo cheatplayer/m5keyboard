@@ -13,8 +13,6 @@
 #include <string>
 
 namespace SDCard{
-    bool isMounted=false;
-    
     void mount();
 
     void ls(const char *path);

@@ -15,9 +15,9 @@ std::vector<InputTask *> inputtasks;
 void displayBLEServerStatus()
 {
   if(isConnected){
-    M5.Lcd.fillCircle(5,230,3,GREEN);
+    M5.Lcd.fillCircle(10,230,3,GREEN);
   }else{
-    M5.Lcd.fillCircle(5,230,3,RED);
+    M5.Lcd.fillCircle(10,230,3,RED);
   }
 }
 
@@ -163,16 +163,16 @@ void inputKeyValue(int key_val){
     if(isConnected){
         //clear mult keys
         if(key_val==176){//alt space 
-            modifierkeys=0
+            modifierkeys=0;
             return;
         }
         //push mult keys
         if(key_val>=144&&key_val<=153){//alt q ~ alt p
-            modifierkeys |= m5keymap[key_val].modifier
+            modifierkeys |= m5keymap[key_val].modifier;
             return;
         }
 
-        usagekey=m5keymap[(int)key_val];
+        KEYMAP usagekey=m5keymap[(int)key_val];
         usagekey.modifier |= modifierkeys;
         modifierkeys=0;
 
