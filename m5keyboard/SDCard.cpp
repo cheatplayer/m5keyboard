@@ -2,10 +2,6 @@
     2019/1/22 by cp
 */
 #include <M5Stack.h>
-#include "SDCard.h"
-#include "FS.h"
-#include "SD.h"
-#include "SPI.h"
 
 void SDCard::displaySDStatus()
 {
@@ -46,4 +42,84 @@ void SDCard::mount(){
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
     SDCard::isMounted=true;
     SDCard::displaySDStatus();
+}
+
+void SDCard::ls(const char *path){
+
+}
+
+bool SDCard::mkdir(const char *path){
+    if(SDCard.isMounted&&SD.mkdir(path)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool SDCard::rmdir(const char *path){
+    if(SDCard.isMounted&&SD.rmdir){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+std::string SDCard::read(const char *path){
+    if(SDCard.isMounted){
+        File file=SD.open(path);
+        if(!file){
+            return "";
+        }
+    }
+    std::string result;
+    while(file.available()){
+        result+=file.read();
+    }
+    file.close();
+    return result;
+}
+
+bool SDCard::write(const char *path,const char *message){
+    File file = SD.open(path, FILE_WRITE);
+    if(!file||!SDCard.isMounted){
+        return false;
+    }
+    if(file.print(message)){
+        file.close();
+        return true;
+    } else {
+        file.close();
+        return false;
+    }
+    
+}
+
+bool SDCard::append(const char *path,const char *message){
+    File file = SD.open(path, FILE_APPEND);
+    if(!file||!SDCard::isMounted){
+        return false;
+    }
+    if(file.print(message)){
+        file.close();
+        return true;
+    } else {
+        file.close();
+        return false;
+    }
+}
+
+bool SDCard::mv(const char *from,const char *to){
+    if(SDCard::isMounted&&SD.rename(from,to)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool SDCard::rm(const char *path){
+    if(SDCard::isMounted&&SD.remove(path)){
+        return true;
+    }else{
+        return false;
+    }
 }
