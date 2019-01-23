@@ -7,9 +7,20 @@
 #include "SD.h"
 #include "SPI.h"
 
+void SDCard::displaySDStatus()
+{
+  if(SDCard::isMounted){
+    M5.Lcd.fillCircle(10,230,3,GREEN);
+  }else{
+    M5.Lcd.fillCircle(10,230,3,RED);
+  }
+}
+
 void SDCard::mount(){
     if(!SD.begin(4)){
         Serial.println("Card Mount Failed");
+        SDCard::isMounted=false;
+        SDCard::displaySDStatus();
         return;
     }
 
@@ -33,4 +44,6 @@ void SDCard::mount(){
 
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
+    SDCard::isMounted=true;
+    SDCard::displaySDStatus();
 }

@@ -5,75 +5,77 @@
 
 #include <M5Stack.h>
 #include "BLEHIDKeyboard.h"
-#include "M5KeyboardType.h"
 #include "SDCard.h"
+#include "Util.h"
+#include "Display.h"
 
 #define KEYBOARD_I2C_ADDR     0X08
 #define KEYBOARD_INT          5
+
 extern bool isConnected;
-extern std::vector<InputTask *> inputtasks;
+extern void StartBLEServer();
+extern void inputKeyValue(int key_val);
 
-BLEServerTask* bleservertask = NULL;
+int menuindex=0;
+int menulen=3;
 
-void StartBLEServer(void)
-{
-  bleservertask = new BLEServerTask();
-  bleservertask->setStackSize(20000);
-  bleservertask->start();
+const char* menuname[menulen]={
+    "start BLE",
+    "mount SD",
+    "halt"
 }
 
-void (*funcarr[])()={
-  SDCard::mount
+void (*funcarr[menulen])()={
+  StartBLEServer,
+  SDCard::mount,
+  Util::halt
   };
 
 void setup() {
   M5.begin();                   // M5STACK INITIALIZE
-  M5.Lcd.setTextFont(2);
-  M5.Lcd.fillScreen(BLACK);     // CLEAR SCREEN
-  M5.Lcd.setTextColor(WHITE);
   Serial.begin(115200);         // SERIAL
-
-  StartBLEServer();
-
   Wire.begin();
+
+  Display::init();
+  Display::menu(menuname[menuindex]);
+
   pinMode(KEYBOARD_INT, INPUT_PULLUP);  //m5stack face keyboard
 }
 
 void loop() {
   if(M5.BtnA.wasPressed()) {
-    InputTask *task = new InputTask("Hello From M5Stack!\n");
-    task->start();
-    inputtasks.push_back(task);
+    Serial.println("exec "+menuname[menuindex]);
+    funcarr[menuindex]();
   }
 
   if(M5.BtnB.wasPressed()) {
-    KEYMAP payload[1];
-//    payload[0] = {0x4c, KEY_CTRL | KEY_ALT}; // CTRL+ALT+DEL !!!!
-    payload[0] = {0x2c, KEY_CTRL}; 
-    InputTask *task = new InputTask(payload, 1);
-    task->start();
+    menuindex++;
+    if(menuindex >= menulen){
+        menuindex=0;
+    }
+    Display::menu(menuname[menuindex]);
   }
   
   if (M5.BtnC.wasPressed()) {
     Serial.println("btn c");
-    funcarr[0]();
+    KEYMAP payload[1];
+    payload[0] = {0x2c, KEY_CTRL | KEY_ALT};
+    Serial.println(payload[0].usage);
+    Serial.println(payload[0].modifier);
+    MyTask *task = new MyTask(payload, 1);
+    task->start();
   }
 
   if(digitalRead(KEYBOARD_INT) == LOW) {
     Wire.requestFrom(KEYBOARD_I2C_ADDR, 1);  // request 1 byte from keyboard
     while (Wire.available()) { 
-      uint8_t key_val = Wire.read();                  // receive a byte as character
+      uint8_t key_val = Wire.read();         // receive a byte as character
+      Serial.print((char)key_val);
+      Serial.print((int)key_val);
+      Serial.printf("0x%02X ",key_val);
       if(key_val != 0) {
-          Serial.print((char)key_val);
-          Serial.print((int)key_val);
-          Serial.printf("0x%02X ",key_val);
           M5.Lcd.print((char)key_val);
-          if(isConnected){
-            KEYMAP payload[1];
-            payload[0]=m5keymap[(int)key_val];
-            InputTask *task = new InputTask(payload,1);
-            task->start();
-          }
+          inputKeyValue((int)key_val);
       }
     }
   }

@@ -12,42 +12,6 @@ bool isConnected = false;
 BLEServer *bleserver;
 std::vector<InputTask *> inputtasks;
 
-const uint8_t reportMap[] = {
-  USAGE_PAGE(1),      0x01,       // Generic Desktop Ctrls
-  USAGE(1),           0x06,       // Keyboard
-  COLLECTION(1),      0x01,       // Application
-  REPORT_ID(1),   0x01,   // REPORTID
-  USAGE_PAGE(1),      0x07,       //   Kbrd/Keypad
-  USAGE_MINIMUM(1),   0xE0,
-  USAGE_MAXIMUM(1),   0xE7,
-  LOGICAL_MINIMUM(1), 0x00,
-  LOGICAL_MAXIMUM(1), 0x01,
-  REPORT_SIZE(1),     0x01,       //   1 byte (Modifier)
-  REPORT_COUNT(1),    0x08,
-  HIDINPUT(1),           0x02,       //   Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position
-  REPORT_COUNT(1),    0x01,       //   1 byte (Reserved)
-  REPORT_SIZE(1),     0x08,
-  HIDINPUT(1),           0x01,       //   Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
-  REPORT_COUNT(1),    0x05,       //   5 bits (Num lock, Caps lock, Scroll lock, Compose, Kana)
-  REPORT_SIZE(1),     0x01,
-  USAGE_PAGE(1),      0x08,       //   LEDs
-  USAGE_MINIMUM(1),   0x01,       //   Num Lock
-  USAGE_MAXIMUM(1),   0x05,       //   Kana
-  HIDOUTPUT(1),          0x02,       //   Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile
-  REPORT_COUNT(1),    0x01,       //   3 bits (Padding)
-  REPORT_SIZE(1),     0x03,
-  HIDOUTPUT(1),          0x01,       //   Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile
-  REPORT_COUNT(1),    0x06,       //   6 bytes (Keys)
-  REPORT_SIZE(1),     0x08,
-  LOGICAL_MINIMUM(1), 0x00,
-  LOGICAL_MAXIMUM(1), 0x65,       //   101 keys
-  USAGE_PAGE(1),      0x07,       //   Kbrd/Keypad
-  USAGE_MINIMUM(1),   0x00,
-  USAGE_MAXIMUM(1),   0x65,
-  HIDINPUT(1),           0x00,       //   Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
-  END_COLLECTION(0)
-};
-
 void displayBLEServerStatus()
 {
   if(isConnected){
@@ -107,15 +71,12 @@ void ServerCallbacks::onConnect(BLEServer* bleserver){
      desc = (BLE2902*) input->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
      desc->setNotifications(true);
      isConnected = true;
-     Serial.println("on connect");
      displayBLEServerStatus();
   }
 
 void ServerCallbacks::onDisconnect(BLEServer* bleserver){
     isConnected = false;
-    Serial.println("on disconnect");
     displayBLEServerStatus();
-
     for(int i=0 ; i<inputtasks.size(); i++) {
       InputTask *task = inputtasks[i];
       task->stop();
@@ -131,10 +92,8 @@ void ServerCallbacks::onDisconnect(BLEServer* bleserver){
  * bit 3 - SCROLL LOCK
  */
 void OutputCallbacks::onWrite(BLECharacteristic* me){
-    Serial.println("on output");
     const char* value = me->getValue().c_str();
-    Serial.println(value);
-    displayBLEServerStatus();
+    M5.Lcd.print(value);
 }
 
 
@@ -186,5 +145,42 @@ void InputTask::run(void*){
         input->notify();
 
         vTaskDelay(100/portTICK_PERIOD_MS);
+    }
+}
+
+BLEServerTask* bleservertask = NULL;
+
+void StartBLEServer()
+{
+  bleservertask = new BLEServerTask();
+  bleservertask->setStackSize(20000);
+  bleservertask->start();
+}
+
+unsigned char modifierkeys=0;
+
+void inputKeyValue(int key_val){
+    if(isConnected){
+        //clear mult keys
+        if(key_val==176){//alt space 
+            modifierkeys=0
+            return;
+        }
+        //push mult keys
+        if(key_val>=144&&key_val<=153){//alt q ~ alt p
+            modifierkeys |= m5keymap[key_val].modifier
+            return;
+        }
+
+        usagekey=m5keymap[(int)key_val];
+        usagekey.modifier |= modifierkeys;
+        modifierkeys=0;
+
+        Serial.print(usagekey.modifier);
+        KEYMAP payload[1];
+        payload[0]=usagekey;
+        InputTask *task = new InputTask(payload,1);
+        task->start();
+        
     }
 }

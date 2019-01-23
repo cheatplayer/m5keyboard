@@ -7,7 +7,10 @@
 #define SDCARD_H
 
 namespace SDCard{
+    bool isMounted=false;
+    
     void mount();
+    void displaySDStatus();
 }
 
 #endif

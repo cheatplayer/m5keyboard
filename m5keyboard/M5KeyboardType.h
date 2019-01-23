@@ -1,6 +1,15 @@
 /*
  * 2019/1/19 by cp
  */
+#define KEY_MOD_LCTRL  0x01
+#define KEY_MOD_LSHIFT 0x02
+#define KEY_MOD_LALT   0x04
+#define KEY_MOD_LMETA  0x08
+#define KEY_MOD_RCTRL  0x10
+#define KEY_MOD_RSHIFT 0x20
+#define KEY_MOD_RALT   0x40
+#define KEY_MOD_RMETA  0x80
+
 const KEYMAP m5keymap[194]={
     {0,0},
     {0,0},
@@ -146,30 +155,30 @@ const KEYMAP m5keymap[194]={
     {0,0},
     {0,0},
     {0,0},
-    {0,0},/* q alt */
+    {0,KEY_MOD_LCTRL},/* q alt 144*/
+    {0,KEY_MOD_LSHIFT},
+    {0,KEY_MOD_LALT},
+    {0,KEY_MOD_LMETA},
     {0,0},
     {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},/* p alt */
-    {0,0},/* a alt */
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
-    {0,0},
+    {0,KEY_MOD_RCTRL},
+    {0,KEY_MOD_RSHIFT},
+    {0,KEY_MOD_RALT},
+    {0,KEY_MOD_RMETA},/* p alt 153*/
+    {0x3a,0},/* a alt */
+    {0x3b,0},
+    {0x3c,0},
+    {0x3d,0},
+    {0x3e,0},
+    {0x3f,0},
+    {0x40,0},
+    {0x41,0},
     {0,0},
     {0,0},/* enter alt*/
-    {0,0},
-    {0,0},/* x alt*/
-    {0,0},
-    {0,0},
+    {0x42,0},
+    {0x43,0},/* x alt*/
+    {0x44,0},
+    {0x45,0},
     {0,0},
     {0,0},
     {0,0},
@@ -177,8 +186,8 @@ const KEYMAP m5keymap[194]={
     {0,0},/*$ alt*/
     {0,0},
     {0,0},
-    {0,0},/* alt 0 */
-    {0,0},/* alt space */
+    {0x29,0},/* alt 0 esc*/
+    {0,0},/* alt space clear mod 176*/
     {0,0},
     {0,0},
     {0,0},
@@ -198,4 +207,38 @@ const KEYMAP m5keymap[194]={
     {0x4f, 0},/*right */
 };
 
-
+const uint8_t reportMap[] = {
+  USAGE_PAGE(1),      0x01,       // Generic Desktop Ctrls
+  USAGE(1),           0x06,       // Keyboard
+  COLLECTION(1),      0x01,       // Application
+  REPORT_ID(1),   0x01,   // REPORTID
+  USAGE_PAGE(1),      0x07,       //   Kbrd/Keypad
+  USAGE_MINIMUM(1),   0xE0,
+  USAGE_MAXIMUM(1),   0xE7,
+  LOGICAL_MINIMUM(1), 0x00,
+  LOGICAL_MAXIMUM(1), 0x01,
+  REPORT_SIZE(1),     0x01,       //   1 byte (Modifier)
+  REPORT_COUNT(1),    0x08,
+  HIDINPUT(1),           0x02,       //   Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position
+  REPORT_COUNT(1),    0x01,       //   1 byte (Reserved)
+  REPORT_SIZE(1),     0x08,
+  HIDINPUT(1),           0x01,       //   Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
+  REPORT_COUNT(1),    0x05,       //   5 bits (Num lock, Caps lock, Scroll lock, Compose, Kana)
+  REPORT_SIZE(1),     0x01,
+  USAGE_PAGE(1),      0x08,       //   LEDs
+  USAGE_MINIMUM(1),   0x01,       //   Num Lock
+  USAGE_MAXIMUM(1),   0x05,       //   Kana
+  HIDOUTPUT(1),          0x02,       //   Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile
+  REPORT_COUNT(1),    0x01,       //   3 bits (Padding)
+  REPORT_SIZE(1),     0x03,
+  HIDOUTPUT(1),          0x01,       //   Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile
+  REPORT_COUNT(1),    0x06,       //   6 bytes (Keys)
+  REPORT_SIZE(1),     0x08,
+  LOGICAL_MINIMUM(1), 0x00,
+  LOGICAL_MAXIMUM(1), 0x65,       //   101 keys
+  USAGE_PAGE(1),      0x07,       //   Kbrd/Keypad
+  USAGE_MINIMUM(1),   0x00,
+  USAGE_MAXIMUM(1),   0x65,
+  HIDINPUT(1),           0x00,       //   Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
+  END_COLLECTION(0)
+};
