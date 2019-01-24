@@ -11,11 +11,12 @@
 #include "SD.h"
 #include "SPI.h"
 #include <string>
+#include <vector>
 
 namespace SDCard{
     void mount();
 
-    void ls(const char *path);
+    std::vector<std::string> ls(const char *path);
     bool mkdir(const char *path);
     bool rmdir(const char *path);
     std::string read(const char *path);

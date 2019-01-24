@@ -27,8 +27,8 @@
 void Display::init(){
     M5.Lcd.setTextFont(2);
     M5.Lcd.setTextColor(WHITE);
-    M5.lcd.setBrightness(30);
-    M5.Lcd.fillScreen(0x050505);
+    M5.lcd.setBrightness(10);
+    M5.Lcd.fillScreen(BLACK);
     M5.Lcd.fillRect(0,220,320,20,0x293573);
 }
 
@@ -40,12 +40,12 @@ void Display::menu(const char* menuname){
 }
 
 void Display::info(const char* info){
-    M5.Lcd.fillRect(100,200,140,20,0x293573);
-    M5.Lcd.setCursor(105,222);
+    M5.Lcd.fillRect(90,200,140,20,0x293573);
+    M5.Lcd.setCursor(95,222);
     M5.Lcd.print(info);
     M5.Lcd.setCursor(0,0);
 }
 
 void Display::clear(){
-    M5.Lcd.fillRect(0,0,320,220,0x050505);
+    M5.Lcd.fillRect(0,0,320,220,BLACK);
 }

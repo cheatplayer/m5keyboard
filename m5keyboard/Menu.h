@@ -13,6 +13,7 @@ namespace Menu{
     void record(char key_val);
     void clear();
     void save();
+    void read();
 }
 
 #endif

@@ -3,7 +3,6 @@
 */
 #include <M5Stack.h>
 #include "SDCard.h"
-#include <string>
 
 bool isMounted=false;
 
@@ -48,19 +47,19 @@ void SDCard::mount(){
     SDCard::displaySDStatus();
 }
 
-std::vector<string> SDCard::ls(const char *path){
-    std::std::vector<string> v;
-    string p=path;
+std::vector<std::string> SDCard::ls(const char *path){
+    std::vector<std::string> v;
+    std::string p=path;
     if(!isMounted){
         return v;
     }
-    File root = fs.open(dirname);
+    File root = SD.open(path);
     if(!root||!root.isDirectory()){
         return v;
     }
     File file=root.openNextFile();
     while(file){
-        string filename=file.name();
+        std::string filename=file.name();
         if(file.isDirectory()){
             // v.push_back(filename+"/");
         }else{

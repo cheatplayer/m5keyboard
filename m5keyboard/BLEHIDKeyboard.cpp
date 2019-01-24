@@ -39,7 +39,7 @@ void BLEServerTask::run(void *data) {
     input = hid->inputReport(1); // <-- input REPORTID from report map
     output = hid->outputReport(1); // <-- output REPORTID from report map
 
-    outputcallbacknew OutputCallbacks();
+    outputcallback=new OutputCallbacks();
     output->setCallbacks(outputcallback);
     std::string name = "cheatplayer";
     hid->manufacturer()->setValue(name);
@@ -155,7 +155,6 @@ BLEServerTask* bleservertask = NULL;
 void StartBLEServer()
 {
     if(isConnected){
-        bleserver.stop();
         isConnected=false;
         displayBLEServerStatus();
         delete hid;
@@ -195,4 +194,3 @@ void inputKeyValue(int key_val){
         simulateKey(usagekey);
     }
 }
-

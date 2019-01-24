@@ -11,12 +11,11 @@ void Menu::halt(){
     M5.powerOFF();
 }
 
-string record_str="";
+std::string record_str="";
 void Menu::record(char key_val){
-    M5.Lcd.print(key_val); 
-    string s=key_val;
-    record_str+=s;
-    Serial.println(record_str);
+    M5.Lcd.print(key_val);
+    record_str+=std::string(1,key_val);
+    Serial.println(record_str.c_str());
 }
 
 void Menu::clear(){
@@ -25,8 +24,8 @@ void Menu::clear(){
     record_str="";
 }
 
-string savename="";
-string savemsg="";
+std::string savename="";
+std::string savemsg="";
 void Menu::save(){
     if(savename==""){
         savemsg=record_str;
@@ -34,7 +33,7 @@ void Menu::save(){
         savename="/";
     }else{
         savename+=record_str;
-        if(SDCard::write(savename,savemsg)){
+        if(SDCard::write(savename.c_str(),savemsg.c_str())){
             Display::info("save ok");
         }else{
             Display::info("save fail");
@@ -45,12 +44,12 @@ void Menu::save(){
         Menu::clear();
 }
 
-string readname="";
-std::vector<string> readfiles;
+std::string readname="";
+std::vector<std::string> readfiles;
 void Menu::read(){
     if(readname==""){
-        readfiles=SDCard::ls('/');
+        readfiles=SDCard::ls("/");
         readname=readfiles[0];
-        Display::info(readname);
+        Display::info(readname.c_str());
     }
 }
