@@ -1,16 +1,19 @@
 /*
     2019/1/21 by cp
 */
-#include <vector>
 #include <M5Stack.h>
 #include "BLEHIDKeyboard.h"
+
+bool isConnected = false;
 
 BLEHIDDevice *hid;
 BLECharacteristic *input;
 BLECharacteristic *output;
-bool isConnected = false;
 BLEServer *bleserver;
-std::vector<InputTask *> inputtasks;
+BLESecurity *security;
+ServerCallbacks *servercallback;
+OutputCallbacks *outputcallback;
+
 
 void displayBLEServerStatus()
 {
@@ -25,7 +28,8 @@ void BLEServerTask::run(void *data) {
 
     BLEDevice::init("M5 BlueTooth Keyboard");
     bleserver = BLEDevice::createServer();
-    bleserver->setCallbacks(new ServerCallbacks());
+    servercallback=new ServerCallbacks();
+    bleserver->setCallbacks(servercallback);
 
     /*
      * https://www.bluetooth.com/specifications/gatt/viewer
@@ -35,7 +39,8 @@ void BLEServerTask::run(void *data) {
     input = hid->inputReport(1); // <-- input REPORTID from report map
     output = hid->outputReport(1); // <-- output REPORTID from report map
 
-    output->setCallbacks(new OutputCallbacks());
+    outputcallbacknew OutputCallbacks();
+    output->setCallbacks(outputcallback);
     std::string name = "cheatplayer";
     hid->manufacturer()->setValue(name);
     hid->pnp(0x02, 0xe502, 0xa111, 0x0210);
@@ -54,14 +59,14 @@ void BLEServerTask::run(void *data) {
     pAdvertising->addServiceUUID(hid->hidService()->getUUID());
     pAdvertising->start();
 
-    BLESecurity *pSecurity = new BLESecurity();
-    pSecurity->setAuthenticationMode(ESP_LE_AUTH_BOND);//a
+    security = new BLESecurity();
+    security->setAuthenticationMode(ESP_LE_AUTH_BOND);//a
 
     Serial.println("server advertising");
     displayBLEServerStatus();
     Serial.println(hid->hidService()->getUUID().toString().c_str());
 
-    delay(1000000);
+    // delay(1000000);
 }
 
 
@@ -77,11 +82,6 @@ void ServerCallbacks::onConnect(BLEServer* bleserver){
 void ServerCallbacks::onDisconnect(BLEServer* bleserver){
     isConnected = false;
     displayBLEServerStatus();
-    for(int i=0 ; i<inputtasks.size(); i++) {
-      InputTask *task = inputtasks[i];
-      task->stop();
-    }
-    inputtasks.clear();
 }
 
 /*
@@ -96,6 +96,21 @@ void OutputCallbacks::onWrite(BLECharacteristic* me){
     M5.Lcd.print(value);
 }
 
+void simulateKey(KEYMAP map){
+    /*
+     * simulate keydown, we can send up to 6 keys
+     */
+    uint8_t a[] = {map.modifier, 0x0, map.usage, 0x0,0x0,0x0,0x0,0x0};
+    input->setValue(a,sizeof(a));
+    input->notify();
+
+    /*
+     * simulate keyup
+     */
+    uint8_t v[] = {0x0, 0x0, 0x0, 0x0,0x0,0x0,0x0,0x0};
+    input->setValue(v, sizeof(v));
+    input->notify();
+}
 
 InputTask::InputTask(const char *text) {
     setString(text);
@@ -130,20 +145,7 @@ void InputTask::setKeys(const KEYMAP *payload, int length) {
 void InputTask::run(void*){
     for(int i=0 ; i<length ; i++) {
         KEYMAP map = payload[i];
-        /*
-         * simulate keydown, we can send up to 6 keys
-         */
-        uint8_t a[] = {map.modifier, 0x0, map.usage, 0x0,0x0,0x0,0x0,0x0};
-        input->setValue(a,sizeof(a));
-        input->notify();
-
-        /*
-         * simulate keyup
-         */
-        uint8_t v[] = {0x0, 0x0, 0x0, 0x0,0x0,0x0,0x0,0x0};
-        input->setValue(v, sizeof(v));
-        input->notify();
-
+        simulateKey(map);
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
 }
@@ -152,9 +154,23 @@ BLEServerTask* bleservertask = NULL;
 
 void StartBLEServer()
 {
-  bleservertask = new BLEServerTask();
-  bleservertask->setStackSize(20000);
-  bleservertask->start();
+    if(isConnected){
+        bleserver.stop();
+        isConnected=false;
+        displayBLEServerStatus();
+        delete hid;
+        delete input;
+        delete output;
+        delete bleserver;
+        delete security;
+        delete servercallback;
+        delete outputcallback;
+        delete bleservertask;
+    }else{
+        bleservertask = new BLEServerTask();
+        bleservertask->setStackSize(20000);
+        bleservertask->start();
+    }
 }
 
 unsigned char modifierkeys=0;
@@ -176,11 +192,7 @@ void inputKeyValue(int key_val){
         usagekey.modifier |= modifierkeys;
         modifierkeys=0;
 
-        Serial.print(usagekey.modifier);
-        KEYMAP payload[1];
-        payload[0]=usagekey;
-        InputTask *task = new InputTask(payload,1);
-        task->start();
-        
+        simulateKey(usagekey);
     }
 }
+

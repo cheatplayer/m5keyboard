@@ -7,8 +7,8 @@
 
 namespace Display{
     void init();
-    void menu(const char*);
-    void clear();
+    void menu(const char* menuname);
+    void clear(const char* info);
 }
 
 #endif

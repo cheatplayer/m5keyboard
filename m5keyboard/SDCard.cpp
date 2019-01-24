@@ -3,6 +3,7 @@
 */
 #include <M5Stack.h>
 #include "SDCard.h"
+#include <string>
 
 bool isMounted=false;
 
@@ -47,8 +48,27 @@ void SDCard::mount(){
     SDCard::displaySDStatus();
 }
 
-void SDCard::ls(const char *path){
-
+std::vector<string> SDCard::ls(const char *path){
+    std::std::vector<string> v;
+    string p=path;
+    if(!isMounted){
+        return v;
+    }
+    File root = fs.open(dirname);
+    if(!root||!root.isDirectory()){
+        return v;
+    }
+    File file=root.openNextFile();
+    while(file){
+        string filename=file.name();
+        if(file.isDirectory()){
+            // v.push_back(filename+"/");
+        }else{
+            v.push_back(filename);
+        }
+        file=root.openNextFile();
+    }
+    return v;
 }
 
 bool SDCard::mkdir(const char *path){
@@ -84,8 +104,11 @@ std::string SDCard::read(const char *path){
 }
 
 bool SDCard::write(const char *path,const char *message){
+    if(!isMounted){
+        return false;
+    }
     File file = SD.open(path, FILE_WRITE);
-    if(!file||!isMounted){
+    if(!file){
         return false;
     }
     if(file.print(message)){
@@ -99,8 +122,11 @@ bool SDCard::write(const char *path,const char *message){
 }
 
 bool SDCard::append(const char *path,const char *message){
+    if(!isMounted){
+        return false;
+    }
     File file = SD.open(path, FILE_APPEND);
-    if(!file||!isMounted){
+    if(!file){
         return false;
     }
     if(file.print(message)){

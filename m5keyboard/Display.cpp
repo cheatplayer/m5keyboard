@@ -16,9 +16,9 @@
 |                                                 |
 |                                                 |
 +-------------------------------------------------+220
-| * *       menu name     menu info               |
+| * *     menu name     menu info                 |
 +-------------------------------------------------+
-            50                              320x240
+          40            100                 320x240
 
 */
 #include <M5Stack.h>
@@ -33,9 +33,16 @@ void Display::init(){
 }
 
 void Display::menu(const char* menuname){
-    M5.Lcd.fillRect(50,220,170,20,0x293573);
-    M5.Lcd.setCursor(55,222);
+    M5.Lcd.fillRect(40,220,200,20,0x293573);
+    M5.Lcd.setCursor(45,222);
     M5.Lcd.print(menuname);
+    M5.Lcd.setCursor(0,0);
+}
+
+void Display::info(const char* info){
+    M5.Lcd.fillRect(100,200,140,20,0x293573);
+    M5.Lcd.setCursor(105,222);
+    M5.Lcd.print(info);
     M5.Lcd.setCursor(0,0);
 }
 

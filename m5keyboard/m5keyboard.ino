@@ -6,7 +6,7 @@
 #include <M5Stack.h>
 #include "BLEHIDKeyboard.h"
 #include "SDCard.h"
-#include "Util.h"
+#include "Menu.h"
 #include "Display.h"
 
 #define KEYBOARD_I2C_ADDR     0X08
@@ -17,18 +17,20 @@ extern void StartBLEServer();
 extern void inputKeyValue(int key_val);
 
 int menuindex= 0;
-int menulen= 3;
+const int MENULEN= 4;
 
-const char* menuname[3]={
-    "start BLE",
-    "mount SD",
-    "halt"
+const char* menuname[MENULEN]={
+    "BLE",
+    "halt",
+    "clear",
+    "save",
 };
 
-void (*funcarr[3])()={
+void (*funcarr[MENULEN])()={
   StartBLEServer,
-  SDCard::mount,
-  Util::halt
+  Menu::halt,
+  Menu::clear,
+  Menu::save
   };
 
 void setup() {
@@ -38,32 +40,27 @@ void setup() {
 
   Display::init();
   Display::menu(menuname[menuindex]);
+  SDCard::mount();
 
   pinMode(KEYBOARD_INT, INPUT_PULLUP);  //m5stack face keyboard
 }
 
 void loop() {
   if(M5.BtnA.wasPressed()) {
-    Serial.println(menuname[menuindex]);
-    funcarr[menuindex]();
-  }
-
-  if(M5.BtnB.wasPressed()) {
     menuindex++;
-    if(menuindex >= menulen){
+    if(menuindex >= MENULEN){
         menuindex=0;
     }
     Display::menu(menuname[menuindex]);
   }
+
+  if(M5.BtnB.wasPressed()) {
+
+  }
   
   if (M5.BtnC.wasPressed()) {
-    Serial.println("btn c");
-    KEYMAP payload[1];
-    payload[0] = {0x2c, KEY_CTRL | KEY_ALT};
-    Serial.println(payload[0].usage);
-    Serial.println(payload[0].modifier);
-    InputTask *task = new InputTask(payload, 1);
-    task->start();
+    Serial.println(menuname[menuindex]);
+    funcarr[menuindex]();
   }
 
   if(digitalRead(KEYBOARD_INT) == LOW) {
@@ -74,8 +71,8 @@ void loop() {
       Serial.print((int)key_val);
       Serial.printf("0x%02X ",key_val);
       if(key_val != 0) {
-          M5.Lcd.print((char)key_val);
-          inputKeyValue((int)key_val);
+        Menu::record((char)key_val);
+        inputKeyValue((int)key_val);
       }
     }
   }
