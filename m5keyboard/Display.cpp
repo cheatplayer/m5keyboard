@@ -1,7 +1,8 @@
 /*
     2019/1/23 by cp
+ 5x2 10x18 31x12
 +-------------------------------------------------+
-|                                          320*220|
+|                                          320x220|
 |                                                 |
 |                                                 |
 |                                                 |
@@ -36,7 +37,6 @@ void Display::menu(const char* menuname){
     M5.Lcd.fillRect(40,220,200,20,0x293573);
     M5.Lcd.setCursor(45,222);
     M5.Lcd.print(menuname);
-    M5.Lcd.setCursor(0,0);
 }
 
 void Display::info(const char* info){

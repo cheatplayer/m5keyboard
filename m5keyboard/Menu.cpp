@@ -15,7 +15,6 @@ std::string record_str="";
 void Menu::record(char key_val){
     M5.Lcd.print(key_val);
     record_str+=std::string(1,key_val);
-    Serial.println(record_str.c_str());
 }
 
 void Menu::clear(){
@@ -41,7 +40,7 @@ void Menu::save(){
         savename="";
         savemsg="";
     }
-        Menu::clear();
+    Menu::clear();    
 }
 
 std::string readname="";
