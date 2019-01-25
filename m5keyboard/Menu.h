@@ -14,6 +14,11 @@ namespace Menu{
     void clear();
     void save();
     void read();
+    void readNext();
+    void hack();
+    void hackStop();
+    void rm();
+    void rmNext();
 }
 
 #endif

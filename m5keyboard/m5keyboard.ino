@@ -13,24 +13,38 @@
 #define KEYBOARD_INT          5
 
 extern void StartBLEServer();
+extern void StopBLEServer();
 extern void inputKeyValue(int key_val);
 
 int menuindex= 0;
-const int MENULEN= 4;
+const int MENULEN= 6;
 
 const char* menuname[MENULEN]={
     "BLE",
     "halt",
-    "clear",
     "save",
+    "load",
+    "hack",
+    "rm"
 };
 
 void (*funcarr[MENULEN])()={
   StartBLEServer,
   Menu::halt,
-  Menu::clear,
-  Menu::save
-  };
+  Menu::save,
+  Menu::read,
+  Menu::hack,
+  Menu::rm
+};
+
+void (*funcarrNext[MENULEN])()={
+    StopBLEServer,
+    Menu::clear,
+    Menu::clear,
+    Menu::readNext,
+    Menu::hackStop,
+    Menu::rmNext
+};
 
 void setup() {
   M5.begin();              
@@ -54,11 +68,10 @@ void loop() {
   }
 
   if(M5.BtnB.wasPressed()) {
-
+    funcarrNext[menuindex]();
   }
   
   if (M5.BtnC.wasPressed()) {
-    Serial.println(menuname[menuindex]);
     funcarr[menuindex]();
   }
 

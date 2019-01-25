@@ -40,8 +40,8 @@ void Display::menu(const char* menuname){
 }
 
 void Display::info(const char* info){
-    M5.Lcd.fillRect(90,200,140,20,0x293573);
-    M5.Lcd.setCursor(95,222);
+    M5.Lcd.fillRect(120,220,220,20,0x293573);
+    M5.Lcd.setCursor(125,222);
     M5.Lcd.print(info);
 }
 
@@ -59,6 +59,7 @@ void Display::print(char c){
     int i=(int)c;
     if(i==8){//backspace
         M5.Lcd.fillRect(cursor_x,cursor_y,10,18,BLACK);
+        cursor_x-=10;
         return;
     }
     if(i==13){//enter
@@ -66,9 +67,11 @@ void Display::print(char c){
         cursor_x=5;
         return;
     }
-    if(cursor_x>=310){
+    if(cursor_x>=300){
         cursor_x=5;
         cursor_y+=18;
+    }else{
+      cursor_x+=10;
     }
     if(cursor_y>=216){
         cursor_y=2;

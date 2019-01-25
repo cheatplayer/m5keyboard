@@ -3,6 +3,7 @@
 */
 #include <M5Stack.h>
 #include "BLEHIDKeyboard.h"
+#include "Display.h"
 
 bool isConnected = false;
 
@@ -148,12 +149,19 @@ void InputTask::run(void*){
         simulateKey(map);
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
+    Display::info("hack ok");
 }
 
 BLEServerTask* bleservertask = NULL;
 
 void StartBLEServer()
 {
+        bleservertask = new BLEServerTask();
+        bleservertask->setStackSize(20000);
+        bleservertask->start();
+}
+
+void StopBLEServer(){
     if(isConnected){
         advertising->stop();
         hid->deviceInfo()->stop();
@@ -169,10 +177,6 @@ void StartBLEServer()
         delete servercallback;
         delete outputcallback;
         delete bleservertask;
-    }else{
-        bleservertask = new BLEServerTask();
-        bleservertask->setStackSize(20000);
-        bleservertask->start();
     }
 }
 
