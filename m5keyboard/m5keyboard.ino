@@ -12,7 +12,6 @@
 #define KEYBOARD_I2C_ADDR     0X08
 #define KEYBOARD_INT          5
 
-extern bool isConnected;
 extern void StartBLEServer();
 extern void inputKeyValue(int key_val);
 
@@ -68,6 +67,7 @@ void loop() {
     while (Wire.available()) { 
       uint8_t key_val = Wire.read();      
       if(key_val != 0) {
+        Display::print((char)key_val);
         Menu::record((char)key_val);
         inputKeyValue((int)key_val);
       }

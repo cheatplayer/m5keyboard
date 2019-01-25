@@ -19,7 +19,7 @@ const KEYMAP m5keymap[194]={
     {0,0},
     {0,0},
     {0,0},
-    {0x2a, 0},/* backspace */
+    {0x2a, 0},/* backspace 8*/
     {0,0},
     {0,0},
     {0,0},

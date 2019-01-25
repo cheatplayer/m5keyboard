@@ -13,6 +13,7 @@ BLEServer *bleserver;
 BLESecurity *security;
 ServerCallbacks *servercallback;
 OutputCallbacks *outputcallback;
+BLEAdvertising *advertising;
 
 
 void displayBLEServerStatus()
@@ -54,10 +55,10 @@ void BLEServerTask::run(void *data) {
     /*
      * Its good to setup advertising by providing appearance and advertised service. This will let clients find our device by type
      */
-    BLEAdvertising *pAdvertising = bleserver->getAdvertising();
-    pAdvertising->setAppearance(HID_KEYBOARD);
-    pAdvertising->addServiceUUID(hid->hidService()->getUUID());
-    pAdvertising->start();
+    advertising = bleserver->getAdvertising();
+    advertising->setAppearance(HID_KEYBOARD);
+    advertising->addServiceUUID(hid->hidService()->getUUID());
+    advertising->start();
 
     security = new BLESecurity();
     security->setAuthenticationMode(ESP_LE_AUTH_BOND);//a
@@ -66,7 +67,6 @@ void BLEServerTask::run(void *data) {
     displayBLEServerStatus();
     Serial.println(hid->hidService()->getUUID().toString().c_str());
 
-    // delay(1000000);
 }
 
 
@@ -93,7 +93,7 @@ void ServerCallbacks::onDisconnect(BLEServer* bleserver){
  */
 void OutputCallbacks::onWrite(BLECharacteristic* me){
     const char* value = me->getValue().c_str();
-    M5.Lcd.print(value);
+    Serial.print("output callback");
 }
 
 void simulateKey(KEYMAP map){
@@ -155,6 +155,10 @@ BLEServerTask* bleservertask = NULL;
 void StartBLEServer()
 {
     if(isConnected){
+        advertising->stop();
+        hid->deviceInfo()->stop();
+        hid->hidService()->stop();
+        hid->batteryService()->stop();
         isConnected=false;
         displayBLEServerStatus();
         delete hid;

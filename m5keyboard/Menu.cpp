@@ -13,7 +13,7 @@ void Menu::halt(){
 
 std::string record_str="";
 void Menu::record(char key_val){
-    M5.Lcd.print(key_val);
+    // int i=(int)key_val;//todo record special key
     record_str+=std::string(1,key_val);
 }
 

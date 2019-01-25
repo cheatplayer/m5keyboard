@@ -10,6 +10,7 @@ namespace Display{
     void menu(const char* menuname);
     void clear();
     void info(const char* info);
+    void print(char c);
 }
 
 #endif
