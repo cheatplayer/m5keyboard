@@ -58,6 +58,9 @@ std::string findname="";
 std::vector<std::string> findfiles;
 int findindex=0;
 void Menu::find(){
+    if(findfiles.size()==0){
+        return;
+    }
     if(findindex>=findfiles.size()-1){
         findindex=0;
     }else{
