@@ -43,70 +43,70 @@ void Menu::save(){
     }else{
         savename+=record_str;
         if(SDCard::write(savename.c_str(),savemsg.c_str())){
-            Display::info("save ok");
+            Display::result("save ok");
         }else{
-            Display::info("save fail");
+            Display::result("save fail");
         }
         savename="";
         savemsg="";
     }
-    Menu::clear();    
+    Menu::clear();  
+    Menu::rels();  
 }
 
-std::string readname="";
-std::vector<std::string> readfiles;
-int nowreadindex=0;
-void Menu::read(){
-    if(readname==""){
-        readfiles=SDCard::ls("/");
-        readname=readfiles[0];
-        Display::info(readname.c_str());
+std::string findname="";
+std::vector<std::string> findfiles;
+int findindex=0;
+void Menu::find(){
+    if(findindex>=findfiles.size()-1){
+        findindex=0;
+    }else{
+        findindex++;
+    }
+    findname=findfiles[findindex];
+    Display::info(findname.c_str());
+}
+
+void Menu::rels(){
+    findfiles.clear();
+    findfiles=SDCard::ls("/");
+    findname="";
+    findindex=0;
+
+}
+
+void Menu::ls(){
+    Menu::rels();
+    Menu::clear();
+    int i=0;
+    while(i<findfiles.size()){
+      M5.Lcd.println(findfiles[i].c_str());
+      i++;
+    } 
+}
+
+void Menu::rm(){
+    if(findname==""){
+        Display::result("find first");
+    }else{
+        if(SDCard::rm(findname.c_str())){
+            Display::result("rm ok");
+        }else{
+            Display::result("rm fail");
+        }
+        Menu::rels();
+    }
+}
+
+void Menu::load(){
+    if(findname==""){
+        Display::result("find first");
     }else{
         Menu::clear();
-        record_str=SDCard::read(readname.c_str());
+        record_str=SDCard::read(findname.c_str());
         M5.Lcd.print(record_str.c_str());
-        readname="";
-        nowreadindex=0;
-        readfiles.clear();
+        Display::result("load ok");
     }
-}
-
-void Menu::readNext(){
-    nowreadindex++;
-    if(nowreadindex>=readfiles.size()){
-        nowreadindex=0;
-    }
-    readname=readfiles[nowreadindex];
-    Display::info(readname.c_str());
-}
-
-std::string rmname="";
-std::vector<std::string> rmfiles;
-int nowrmindex=0;
-void Menu::rm(){
-    if(rmname==""){
-        rmfiles=SDCard::ls("/");
-        rmname=rmfiles[0];
-        Display::info(rmname.c_str());
-    }else{
-        if(SDCard::rm(rmname.c_str())){
-            Display::info("rm ok");
-        }else{
-            Display::info("rm fail");
-        }
-        rmfiles.clear();
-        rmname="";
-        nowrmindex=0;
-    }
-}
-
-void Menu::rmNext(){
-    nowrmindex++;
-    if(nowrmindex>=rmfiles.size()){
-        nowrmindex=0;
-    }
-    rmname=rmfiles[nowrmindex];
-    Display::info(rmname.c_str());
 }
 
 InputTask *hacktask;
@@ -114,14 +114,14 @@ void Menu::hack(){
   if(isConnected){
     hacktask= new InputTask(record_str.c_str());
     hacktask->start();
-    Display::info("hacking...");
+    Display::result("hacking...");
   }else{
-    Display::info("hack fail");  
+    Display::result("hack fail");  
   }
 }
 
 void Menu::hackStop(){
     hacktask->stop();
     delete hacktask;
-    Display::info("hack stoped");
+    Display::result("hack stoped");
 }

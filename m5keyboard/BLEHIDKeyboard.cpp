@@ -149,7 +149,7 @@ void InputTask::run(void*){
         simulateKey(map);
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
-    Display::info("hack ok");
+    Display::result("hack ok");
 }
 
 BLEServerTask* bleservertask = NULL;

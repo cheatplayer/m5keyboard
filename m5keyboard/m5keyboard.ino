@@ -20,30 +20,39 @@ int menuindex= 0;
 const int MENULEN= 6;
 
 const char* menuname[MENULEN]={
-    "BLE",
-    "halt",
+    "startBLE",
     "save",
     "load",
     "hack",
+    "halt",
     "rm"
+};
+
+const char* infoname[MENULEN]={
+    "stopBLE",
+    "clear",
+    "find",
+    "cancel",
+    "ls",
+    "find"
 };
 
 void (*funcarr[MENULEN])()={
   StartBLEServer,
-  Menu::halt,
   Menu::save,
-  Menu::read,
+  Menu::load,
   Menu::hack,
+  Menu::halt,
   Menu::rm
 };
 
 void (*funcarrNext[MENULEN])()={
     StopBLEServer,
     Menu::clear,
-    Menu::clear,
-    Menu::readNext,
+    Menu::find,
     Menu::hackStop,
-    Menu::rmNext
+    Menu::ls,
+    Menu::find
 };
 
 void setup() {
@@ -53,18 +62,17 @@ void setup() {
 
   Display::init();
   Display::menu(menuname[menuindex]);
+  Display::info(infoname[menuindex]);
+  Display::result("menu");
   SDCard::mount();
+  Menu::rels();
 
   pinMode(KEYBOARD_INT, INPUT_PULLUP);  //m5stack face keyboard
 }
 
 void loop() {
   if(M5.BtnA.wasPressed()) {
-    menuindex++;
-    if(menuindex >= MENULEN){
-        menuindex=0;
-    }
-    Display::menu(menuname[menuindex]);
+    funcarr[menuindex]();
   }
 
   if(M5.BtnB.wasPressed()) {
@@ -72,7 +80,13 @@ void loop() {
   }
   
   if (M5.BtnC.wasPressed()) {
-    funcarr[menuindex]();
+    menuindex++;
+    if(menuindex >= MENULEN){
+        menuindex=0;
+    }
+    Display::menu(menuname[menuindex]);
+    Display::info(infoname[menuindex]);
+    Display::result("menu");
   }
 
   if(digitalRead(KEYBOARD_INT) == LOW) {

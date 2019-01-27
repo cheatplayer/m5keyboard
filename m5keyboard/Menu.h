@@ -13,12 +13,13 @@ namespace Menu{
     void record(char key_val);
     void clear();
     void save();
-    void read();
-    void readNext();
+    void load();
     void hack();
     void hackStop();
     void rm();
-    void rmNext();
+    void find();
+    void rels();
+    void ls();
 }
 
 #endif
