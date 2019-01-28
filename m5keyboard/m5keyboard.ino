@@ -8,6 +8,7 @@
 #include "SDCard.h"
 #include "Menu.h"
 #include "Display.h"
+#include "server/Server.h"
 
 #define KEYBOARD_I2C_ADDR     0X08
 #define KEYBOARD_INT          5
@@ -15,6 +16,11 @@
 extern void StartBLEServer();
 extern void StopBLEServer();
 extern void inputKeyValue(int key_val);
+extern void displayBLEServerStatus();
+
+extern bool isAPStarted;
+extern bool isSTAConnected;
+extern WebServer webServer;
 
 int menuindex= 0;
 const int MENULEN= 6;
@@ -66,6 +72,7 @@ void setup() {
   Display::result("menu");
   SDCard::mount();
   Menu::rels();
+  displayBLEServerStatus();
 
   pinMode(KEYBOARD_INT, INPUT_PULLUP);  //m5stack face keyboard
 }
@@ -100,5 +107,10 @@ void loop() {
       }
     }
   }
+
+  if(isAPStarted||isSTAConnected){
+      webServer.handleClient();
+  }
+
   M5.update();
 }

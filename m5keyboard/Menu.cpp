@@ -7,6 +7,7 @@
 #include "Display.h"
 #include "SDCard.h"
 #include "BLEHIDKeyboard.h"
+#include "server/Server.h"
 
 extern bool isConnected;
 
