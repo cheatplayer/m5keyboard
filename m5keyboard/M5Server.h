@@ -3,27 +3,25 @@
 */
 
 #ifndef SERVER_H
-#define SDCARD_H
-
+#define SERVER_H
 #include "Task.h"
-#include <string>
 
-namespace Server{
+namespace M5Server{
     void displayServerStatus();
-    std::string makePage();
-    std::string urlDecode();
+    String makePage(String title, String contents);
+    String urlDecode(String input);
     void startServer();
     void startAP();
     void stopAP();
     void startSTA();
     void stopSTA();
     void scanNetworks();
-}
+};
 
 class CheckServerTask:public Task{
 public:
     void run(void *data);
-}
+};
 
 
 #endif

@@ -6,8 +6,6 @@
 #ifndef Menu_H
 #define Menu_H
 
-
-
 namespace Menu{
     void halt();
     void record(char key_val);
@@ -20,6 +18,8 @@ namespace Menu{
     void find();
     void rels();
     void ls();
+    void startSTAMenu();
+    void startAPMenu();
 }
 
 #endif

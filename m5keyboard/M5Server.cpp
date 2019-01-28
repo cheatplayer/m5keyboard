@@ -8,7 +8,7 @@
 #include <WiFiClient.h>
 #include "WebServer.h"
 #include <Preferences.h>
-#include "Server.h"
+#include "M5Server.h"
 
 bool isSTAConnected=false;
 bool isSTAStarted=false;
@@ -16,18 +16,18 @@ bool isAPStarted=false;
 
 const IPAddress apIP(192, 168, 13, 1);
 const char* apSSID = "M5 Wifi";
-std::string wifi_ssid;
-std::string wifi_password;
-std::string ssidstr;
+String wifi_ssid;
+String wifi_password;
+String ssidstr;
 
 // DNSServer dnsServer;
-WebServer webServer;
+WebServer webServer(80);
 
 // wifi config store
 Preferences preferences;
-std::vector<std::string> ssidlist;
+std::vector<String> ssidlist;
 
-void Server::displayServerStatus(){
+void M5Server::displayServerStatus(){
   if(isSTAConnected){
     M5.Lcd.fillCircle(30,230,3,GREEN);
     return;
@@ -44,8 +44,8 @@ void Server::displayServerStatus(){
 }
 
 
-std::string Server::makePage(std::string title, std::string contents) {
-  std::string s = "<!DOCTYPE html><html><head>";
+String M5Server::makePage(String title, String contents) {
+  String s = "<!DOCTYPE html><html><head>";
   s += "<meta name=\"viewport\" content=\"width=device-width,user-scalable=0\">";
   s += "<title>";
   s += title;
@@ -55,8 +55,8 @@ std::string Server::makePage(std::string title, std::string contents) {
   return s;
 }
 
-std::string Server::urlDecode(std::string input) {
-  std::string s = input;
+String M5Server::urlDecode(String input) {
+  String s = input;
   s.replace("%20", " ");
   s.replace("+", " ");
   s.replace("%21", "!");
@@ -90,67 +90,66 @@ std::string Server::urlDecode(std::string input) {
   return s;
 }
 
-void Server::startServer(){
-    webServer(80);
+void M5Server::startServer(){
     webServer.on("/settings", []() {
-      std::string s = "<h1>Wi-Fi Settings</h1><p>Please enter your password by selecting the SSID.</p>";
+      String s = "<h1>Wi-Fi Settings</h1><p>Please enter your password by selecting the SSID.</p>";
       s += "<form method=\"get\" action=\"setap\"><label>SSID: </label><select name=\"ssid\">";
-      s += ssidList;
+      s += ssidstr;
       s += "</select><br>Password: <input name=\"pass\" length=64 type=\"password\"><input type=\"submit\"></form>";
-      webServer.send(200, "text/html", Server::makePage("Wi-Fi Settings", s));
+      webServer.send(200, "text/html", M5Server::makePage("Wi-Fi Settings", s));
     });
 
     webServer.on("/setap", []() {
-      std::string ssid = Server::urlDecode(webServer.arg("ssid"));
-      std::string pass = Server::urlDecode(webServer.arg("pass"));
+      String ssid = M5Server::urlDecode(webServer.arg("ssid"));
+      String pass = M5Server::urlDecode(webServer.arg("pass"));
 
       // Store wifi config
       preferences.putString("WIFI_SSID", ssid);
       preferences.putString("WIFI_PASSWD", pass);
 
-      std::string s = "<h1>Setup complete.</h1><p>device will be connected to \"";
+      String s = "<h1>Setup complete.</h1><p>device will be connected to \"";
       s += ssid;
       s += "\" after the restart.";
-      webServer.send(200, "text/html", Server::makePage("Wi-Fi Settings", s));
+      webServer.send(200, "text/html", M5Server::makePage("Wi-Fi Settings", s));
     });
 
 
     webServer.onNotFound([]() {
-      std::string s = "<h1>AP mode</h1><p><a href=\"/settings\">Wi-Fi Settings</a></p>";
-      webServer.send(200, "text/html", Server::makePage("AP mode", s));
+      String s = "<h1>AP mode</h1><p><a href=\"/settings\">Wi-Fi Settings</a></p>";
+      webServer.send(200, "text/html", M5Server::makePage("AP mode", s));
     });
 
     webServer.on("/", []() {
-      std::string s = "<h1>STA mode</h1><p><a href=\"/reset\">Reset Wi-Fi Settings</a></p>";
-      webServer.send(200, "text/html", Server::makePage("STA mode", s));
+      String s = "<h1>STA mode</h1><p><a href=\"/reset\">Reset Wi-Fi Settings</a></p>";
+      webServer.send(200, "text/html", M5Server::makePage("STA mode", s));
     });
     webServer.on("/reset", []() {
       // reset the wifi config
       preferences.remove("WIFI_SSID");
       preferences.remove("WIFI_PASSWD");
       String s = "<h1>Wi-Fi settings was reset.</h1><p>Please reset device.</p>";
-      webServer.send(200, "text/html", Server::makePage("Reset Wi-Fi Settings", s));
+      webServer.send(200, "text/html", M5Server::makePage("Reset Wi-Fi Settings", s));
     });
 
     webServer.begin();
 }
 
-void Server::startAP(){
+void M5Server::startAP(){
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     WiFi.softAP(apSSID);
     WiFi.mode(WIFI_MODE_AP);
     isAPStarted=true;
-    Server::displayServerStatus();
+    M5Server::displayServerStatus();
 }
 
-void Server::stopAP(){
+void M5Server::stopAP(){
     WiFi.mode(WIFI_MODE_AP);
-    Wifi.softAPdisconnect();
+    WiFi.softAPdisconnect();
     isAPStarted=false;
-    Server::displayServerStatus();
+    M5Server::displayServerStatus();
 }
 
-void Server::startSTA(){
+void M5Server::startSTA(){
     wifi_ssid = preferences.getString("WIFI_SSID");
     if(wifi_ssid.length() > 0) {
         isSTAStarted=true;
@@ -159,19 +158,19 @@ void Server::startSTA(){
     }
     wifi_password = preferences.getString("WIFI_PASSWD");
     WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
-    Wifi.mode(WIFI_MODE_STA);
-    Server::displayServerStatus();
+    WiFi.mode(WIFI_MODE_STA);
+    M5Server::displayServerStatus();
 }
 
-void Server::stopSTA(){
+void M5Server::stopSTA(){
     WiFi.mode(WIFI_MODE_STA);
     WiFi.disconnect();
     isSTAStarted=false;
     isSTAConnected=false;
-    Server::displayServerStatus();
+    M5Server::displayServerStatus();
 }
 
-void Server::scanNetworks(){
+void M5Server::scanNetworks(){
     WiFi.mode(WIFI_MODE_STA);
     WiFi.disconnect();
     delay(100);
@@ -197,6 +196,5 @@ void CheckServerTask::run(void *data){
         count++;
         vTaskDelay(1000);
     }
-    Server::displayServerStatus();
+    M5Server::displayServerStatus();
 }
-

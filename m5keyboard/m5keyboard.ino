@@ -8,7 +8,9 @@
 #include "SDCard.h"
 #include "Menu.h"
 #include "Display.h"
-#include "server/Server.h"
+#include "M5Server.h"
+#include "WebServer.h"
+#include <Preferences.h>
 
 #define KEYBOARD_I2C_ADDR     0X08
 #define KEYBOARD_INT          5
@@ -21,9 +23,10 @@ extern void displayBLEServerStatus();
 extern bool isAPStarted;
 extern bool isSTAConnected;
 extern WebServer webServer;
+extern Preferences preferences;
 
 int menuindex= 0;
-const int MENULEN= 6;
+const int MENULEN= 8;
 
 const char* menuname[MENULEN]={
     "startBLE",
@@ -31,6 +34,8 @@ const char* menuname[MENULEN]={
     "load",
     "hack",
     "halt",
+    "startSTA",
+    "startAP",
     "rm"
 };
 
@@ -40,6 +45,8 @@ const char* infoname[MENULEN]={
     "find",
     "cancel",
     "ls",
+    "stopSTA",
+    "stopAP",
     "find"
 };
 
@@ -49,6 +56,8 @@ void (*funcarr[MENULEN])()={
   Menu::load,
   Menu::hack,
   Menu::halt,
+  Menu::startSTAMenu,
+  Menu::startAPMenu,
   Menu::rm
 };
 
@@ -58,6 +67,8 @@ void (*funcarrNext[MENULEN])()={
     Menu::find,
     Menu::hackStop,
     Menu::ls,
+    M5Server::stopSTA,
+    M5Server::stopAP,
     Menu::find
 };
 
@@ -65,6 +76,7 @@ void setup() {
   M5.begin();              
   Serial.begin(115200);         
   Wire.begin();
+  preferences.begin("wifi-config");
 
   Display::init();
   Display::menu(menuname[menuindex]);
