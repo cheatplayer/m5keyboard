@@ -21,9 +21,9 @@ public:
     std::vector<std::string> lines;
     int length=0;
     Exec(std::string text);
-    ~Exec();
+    Exec();
     void setSplit(std::string text);
-    void run();
+    void run(void*);
     void execLine(std::string line);
     void execBLEString(const char *text); 
 };

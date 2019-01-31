@@ -174,20 +174,20 @@ void Exec::execBLEString(const char *text){
 
 void Exec::execLine(std::string line){
     // Serial.println(line.c_str());
-    if(line.substring(0,3)==">>>"){
-
-    }else if(line.substring(0,3)=="$$$"){
-        vTaskDelay(line.substring(4).toInt())
-    }else if(line.substring(0,3)=="~~~"){
-
-    }else if(line.substring(0,3)==":::"){
-
-    }else{
+//    if(line.substring(0,3)==">>>"){
+//
+//    }else if(line.substring(0,3)=="$$$"){
+//        vTaskDelay(line.substring(4).toInt())
+//    }else if(line.substring(0,3)=="~~~"){
+//
+//    }else if(line.substring(0,3)==":::"){
+//
+//    }else{
         execBLEString(line.c_str());
-    }
+//    }
 }
 
-void Exec::run(){
+void Exec::run(void*){
     int i=0;
     while(i<length){
         execLine(lines[i]);
