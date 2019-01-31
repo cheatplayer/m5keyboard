@@ -26,7 +26,52 @@ void displayBLEServerStatus()
   }
 }
 
-void BLEServerTask::run(void *data) {
+void ServerCallbacks::onConnect(BLEServer* bleserver){
+     BLE2902* desc;
+     desc = (BLE2902*) input->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
+     desc->setNotifications(true);
+     isConnected = true;
+     displayBLEServerStatus();
+}
+
+void ServerCallbacks::onDisconnect(BLEServer* bleserver){
+    isConnected = false;
+    displayBLEServerStatus();
+}
+
+/*
+ * This callback is connect with output report. In keyboard output report report special keys changes, like CAPSLOCK, NUMLOCK
+ * We can add digital pins with LED to show status
+ * bit 1 - NUM LOCK
+ * bit 2 - CAPS LOCK
+ * bit 3 - SCROLL LOCK
+ */
+void OutputCallbacks::onWrite(BLECharacteristic* me){
+    const char* value = me->getValue().c_str();
+    Serial.print("output callback");
+}
+
+void simulateKey(KEYMAP map){
+    if(isConnected){
+        /*
+         * simulate keydown, we can send up to 6 keys
+         */
+        uint8_t a[] = {map.modifier, 0x0, map.usage, 0x0,0x0,0x0,0x0,0x0};
+        input->setValue(a,sizeof(a));
+        input->notify();
+
+        /*
+         * simulate keyup
+         */
+        uint8_t v[] = {0x0, 0x0, 0x0, 0x0,0x0,0x0,0x0,0x0};
+        input->setValue(v, sizeof(v));
+        input->notify();  
+    }
+
+}
+
+void StartBLEServer()
+{
 
     BLEDevice::init("M5 BlueTooth Keyboard");
     bleserver = BLEDevice::createServer();
@@ -67,98 +112,6 @@ void BLEServerTask::run(void *data) {
     Serial.println("server advertising");
     displayBLEServerStatus();
     Serial.println(hid->hidService()->getUUID().toString().c_str());
-
-}
-
-
-
-void ServerCallbacks::onConnect(BLEServer* bleserver){
-     BLE2902* desc;
-     desc = (BLE2902*) input->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
-     desc->setNotifications(true);
-     isConnected = true;
-     displayBLEServerStatus();
-  }
-
-void ServerCallbacks::onDisconnect(BLEServer* bleserver){
-    isConnected = false;
-    displayBLEServerStatus();
-}
-
-/*
- * This callback is connect with output report. In keyboard output report report special keys changes, like CAPSLOCK, NUMLOCK
- * We can add digital pins with LED to show status
- * bit 1 - NUM LOCK
- * bit 2 - CAPS LOCK
- * bit 3 - SCROLL LOCK
- */
-void OutputCallbacks::onWrite(BLECharacteristic* me){
-    const char* value = me->getValue().c_str();
-    Serial.print("output callback");
-}
-
-void simulateKey(KEYMAP map){
-    /*
-     * simulate keydown, we can send up to 6 keys
-     */
-    uint8_t a[] = {map.modifier, 0x0, map.usage, 0x0,0x0,0x0,0x0,0x0};
-    input->setValue(a,sizeof(a));
-    input->notify();
-
-    /*
-     * simulate keyup
-     */
-    uint8_t v[] = {0x0, 0x0, 0x0, 0x0,0x0,0x0,0x0,0x0};
-    input->setValue(v, sizeof(v));
-    input->notify();
-}
-
-InputTask::InputTask(const char *text) {
-    setString(text);
-}
-  
-InputTask::InputTask(const KEYMAP *payload, int length) {
-    setKeys(payload, length);
-}
-
-InputTask::InputTask() {
-    length = 0;
-}
-
-void InputTask::setString(const char *text) {
-    length = 0;
-    const char *pointer = text;
-    while(*pointer){
-        KEYMAP map = keymap[(uint8_t)*pointer];
-        payload[length++] = map;
-        pointer++;
-    }
-}
-  
-void InputTask::setKeys(const KEYMAP *payload, int length) {
-    int realLen = min(256, length);
-    for (int i=0 ; i<realLen ; i++) {
-        this->payload[i] = payload[i];
-    }
-    this->length = realLen;
-}
-  
-void InputTask::run(void*){
-    for(int i=0 ; i<length ; i++) {
-        KEYMAP map = payload[i];
-        simulateKey(map);
-        vTaskDelay(100/portTICK_PERIOD_MS);
-    }
-    Display::result("hack ok");
-}
-
-BLEServerTask* bleservertask = NULL;
-
-void StartBLEServer()
-{
-        bleservertask = new BLEServerTask();
-        bleservertask->setStackSize(20000);
-        bleservertask->start();
 }
 
 void StopBLEServer(){
@@ -176,7 +129,6 @@ void StopBLEServer(){
         delete security;
         delete servercallback;
         delete outputcallback;
-        delete bleservertask;
     }
 }
 

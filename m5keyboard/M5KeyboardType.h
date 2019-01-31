@@ -10,6 +10,12 @@
 #define KEY_MOD_RALT   0x40
 #define KEY_MOD_RMETA  0x80
 
+
+
+
+
+
+
 const KEYMAP m5keymap[194]={
     {0,0},
     {0,0},
@@ -165,25 +171,25 @@ const KEYMAP m5keymap[194]={
     {0,KEY_MOD_RSHIFT},
     {0,KEY_MOD_RALT},
     {0,KEY_MOD_RMETA},/* p alt 153*/
-    {0x3a,0},/* a alt */
+    {0x3a,0},/* a alt f1*/
     {0x3b,0},
     {0x3c,0},
     {0x3d,0},
     {0x3e,0},
     {0x3f,0},
     {0x40,0},
-    {0x41,0},
+    {0x41,0},/*f8*/
     {0,0},
-    {0,0},/* enter alt*/
-    {0x42,0},
+    {0,0},/* enter alt CRLF*/
+    {0x42,0},/*f9*/
     {0x43,0},/* x alt*/
     {0x44,0},
-    {0x45,0},
+    {0x45,0},/*f12*/
     {0,0},
     {0,0},
     {0,0},
     {0,0},
-    {0,0},/*$ alt*/
+    {0,0},/*$ alt delay*/
     {0,0},
     {0,0},
     {0x29,0},/* alt 0 esc*/

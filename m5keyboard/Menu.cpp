@@ -7,6 +7,7 @@
 #include "Display.h"
 #include "SDCard.h"
 #include "BLEHIDKeyboard.h"
+#include "ShExec.h"
 
 extern bool isConnected;
 
@@ -17,15 +18,8 @@ void Menu::halt(){
 std::string record_str="";
 void Menu::record(char key_val){
     int i=(int)key_val;
-    if(i==8){//backspace
-        record_str+="\b";
-        return;
-    }
-    if(i==13){//enter
-        record_str+="\n";
-        return;
-    }
-    record_str+=std::string(1,key_val);
+    std::string sh=Sh::stringify(key_val);
+    record_str+=sh;
 }
 
 void Menu::clear(){
@@ -112,10 +106,10 @@ void Menu::load(){
     }
 }
 
-InputTask *hacktask;
+Exec *hacktask;
 void Menu::hack(){
   if(isConnected){
-    hacktask= new InputTask(record_str.c_str());
+    hacktask= new Exec(record_str);
     hacktask->start();
     Display::result("hacking...");
   }else{
