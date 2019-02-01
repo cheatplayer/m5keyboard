@@ -30,6 +30,12 @@ std::string Sh::stringify(char key_val){
         isrecord_press=false;
         return "";
     }
+    if(isrecord_press&&i==32){
+        isrecord_press=false;
+        std::string result=record_press+"SPACE\r";
+        record_press="";
+        return result;
+    }
     if(isrecord_press&&(i<144||i>153)){
         isrecord_press=false;
         std::string result=record_press+std::string(1,key_val)+"\r";
@@ -102,47 +108,24 @@ std::string Sh::stringify(char key_val){
         return "";
     }
 
-    if(i==127){//del
-        return "\r::: DEL\r";
-    }
-
-    if(i>=154&&i<=161){//f1-f8
-        return "\r::: "+Fmap[i-156]+"\r";
-    }
-    if(i>=164&&i<=167){//f9-f12
-        return "\r::: "+Fmap[i-156]+"\r";
-    }
-
-    if(i==163){
-        return "\n\r";
-    }
-    if(i==172){//delay
-        return "\r$$$ 1000\r";
-    }
-
-    if(i==175){
-        return "\r::: ESC\r";
-    }
-    if(i==182){
-        return "\r::: CAPS\r";
-    }
-    if(i==183){
-        return "\r::: UP\r";
-    }
-    if(i==191){
-        return "\r::: LEFT\r";
-    }
-    if(i==192){
-        return "\r::: DOWN\r";
-    }
-    if(i==193){
-        return "\r::: RIGHT\r";
-    }
+    if(i==13)return "\r::: ENTER\r";
+    if(i==127)return "\r::: DEL\r";
+    if(i>=154&&i<=161)return "\r::: "+Fmap[i-156]+"\r";
+    if(i>=164&&i<=167)return "\r::: "+Fmap[i-156]+"\r";
+    if(i==163)return "\n\r";   
+    if(i==172)return "\r$$$ 1000\r";
+    if(i==175)return "\r::: ESC\r"; 
+    if(i==182)return "\r::: CAPS\r";
+    if(i==183)return "\r::: UP\r";
+    if(i==191)return "\r::: LEFT\r";
+    if(i==192)return "\r::: DOWN\r";
+    if(i==193)return "\r::: RIGHT\r";
 
     return std::string(1,key_val);
 }
 
 int Sh::parse(std::string n){
+    if(n=="ENTER")return 13;
     if(n=="LCTRL"||n=="CTRL")return 144;
     if(n=="LSHIFT"||n=="SHIFT")return 145;
     if(n=="LALT"||n=="ALT")return 146;
@@ -170,6 +153,7 @@ int Sh::parse(std::string n){
     if(n=="LEFT")return 191;
     if(n=="DOWN")return 192;
     if(n=="RIGHT")return 193;
+    if(n=="SPACE")return 32;
     return (int)n[0];
 }
 
@@ -214,11 +198,14 @@ void Exec::execBLEString(const char *text){
     }
 }
 
+extern unsigned char modifierkeys;
+
 void Exec::execLine(std::string line){
     // Serial.println(line.c_str());
    if(line.substr(0,3)==">>>"){
         std::vector<std::string> sp=Sh::split(line.substr(4),' ');
         int i=0;
+        modifierkeys=0;
         while(i<sp.size()){
                 int key=Sh::parse(sp[i]);
                 inputKeyValue(key);
