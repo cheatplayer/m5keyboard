@@ -6,6 +6,21 @@
 #include "BLEHIDKeyboard.h"
 #include "Display.h"
 
+const std::string Fmap[12]={
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11",
+    "F12"
+};
+
 bool isrecord_press=false;
 std::string record_press="";
 std::string Sh::stringify(char key_val){
@@ -15,7 +30,7 @@ std::string Sh::stringify(char key_val){
         isrecord_press=false;
         return "";
     }
-    if(isrecord_press&&i<144&&i>153){
+    if(isrecord_press&&(i<144||i>153)){
         isrecord_press=false;
         std::string result=record_press+std::string(1,key_val)+"\r";
         record_press="";
@@ -91,14 +106,12 @@ std::string Sh::stringify(char key_val){
         return "\r::: DEL\r";
     }
 
-    // if(i>=154&&i<=161){//f1-f8
-    //     std::string num=std::to_string(i-153);
-    //     return "\r~~~ "+num+"\r";
-    // }
-    // if(i>=164&&i<=167){//f9-f12
-    //     std::string num=std::to_string(i-155);
-    //     return "\r~~~ "+num+"\r";
-    // }
+    if(i>=154&&i<=161){//f1-f8
+        return "\r::: "+Fmap[i-156]+"\r";
+    }
+    if(i>=164&&i<=167){//f9-f12
+        return "\r::: "+Fmap[i-156]+"\r";
+    }
 
     if(i==163){
         return "\n\r";
@@ -126,9 +139,38 @@ std::string Sh::stringify(char key_val){
         return "\r::: RIGHT\r";
     }
 
-    //todo test tab /b /n
-
     return std::string(1,key_val);
+}
+
+int Sh::parse(std::string n){
+    if(n=="LCTRL"||n=="CTRL")return 144;
+    if(n=="LSHIFT"||n=="SHIFT")return 145;
+    if(n=="LALT"||n=="ALT")return 146;
+    if(n=="LMETA"||n=="META"||n=="GUI"||n=="CMD")return 147;
+    if(n=="RCTRL")return 150;
+    if(n=="RSHIFT")return 151;
+    if(n=="RALT") return 152;
+    if(n=="RMETA")return 153;
+    if(n=="DEL")return 127;
+    if(n=="F1")return 154;
+    if(n=="F2")return 155;
+    if(n=="F3")return 156;
+    if(n=="F4")return 157;
+    if(n=="F5")return 158;
+    if(n=="F6")return 159;
+    if(n=="F7")return 160;
+    if(n=="F8")return 161;
+    if(n=="F9")return 164;
+    if(n=="F10")return 165;
+    if(n=="F11")return 166;
+    if(n=="F12")return 167;
+    if(n=="ESC")return 175;
+    if(n=="CAPS")return 182;
+    if(n=="UP")return 183;
+    if(n=="LEFT")return 191;
+    if(n=="DOWN")return 192;
+    if(n=="RIGHT")return 193;
+    return (int)n[0];
 }
 
 std::vector<std::string> Sh::split(std::string str,char sep){
@@ -158,6 +200,7 @@ void Exec::setSplit(std::string text){
 
 extern void simulateKey(KEYMAP map);
 extern bool isConnected;
+extern void inputKeyValue(int key_val);
 
 void Exec::execBLEString(const char *text){
     if(isConnected){
@@ -169,22 +212,27 @@ void Exec::execBLEString(const char *text){
             pointer++;
         }
     }
-
 }
 
 void Exec::execLine(std::string line){
     // Serial.println(line.c_str());
-//    if(line.substring(0,3)==">>>"){
-//
-//    }else if(line.substring(0,3)=="$$$"){
-//        vTaskDelay(line.substring(4).toInt())
-//    }else if(line.substring(0,3)=="~~~"){
-//
-//    }else if(line.substring(0,3)==":::"){
-//
-//    }else{
+   if(line.substr(0,3)==">>>"){
+        std::vector<std::string> sp=Sh::split(line.substr(4),' ');
+        int i=0;
+        while(i<sp.size()){
+                int key=Sh::parse(sp[i]);
+                inputKeyValue(key);
+                i++;
+            }
+   }else if(line.substr(0,3)=="$$$"){
+        int n=atoi(line.substr(4).c_str());
+        vTaskDelay(n);
+   }else if(line.substr(0,3)==":::"){
+        int key=Sh::parse(line.substr(4));
+        inputKeyValue(key);
+   }else{
         execBLEString(line.c_str());
-//    }
+   }
 }
 
 void Exec::run(void*){

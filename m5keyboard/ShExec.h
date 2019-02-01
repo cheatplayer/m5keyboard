@@ -2,6 +2,8 @@
     2019/1/31 by cp
     */
 
+
+
 #ifndef SHEXEC_H
 #define SHEXEC_H
 
@@ -12,7 +14,7 @@
 namespace Sh{
     std::string stringify(char key_val);
     std::vector<std::string> split(std::string str,char sep);
-    
+    int parse(std::string keyname);
 }
 
 class Exec:public Task
