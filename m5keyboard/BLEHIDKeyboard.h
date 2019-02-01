@@ -9,7 +9,6 @@
 #include "BLEUtils.h"
 #include "BLE2902.h"
 #include "BLEHIDDevice.h"
-#include "HIDKeyboardTypes.h"
 #include "M5KeyboardType.h"
 
 

@@ -1,6 +1,9 @@
 /*
  * 2019/1/19 by cp
  */
+#ifndef M5KEYBOARDTYPE_H
+#define M5KEYBOARDTYPE_H
+
 #define KEY_MOD_LCTRL  0x01
 #define KEY_MOD_LSHIFT 0x02
 #define KEY_MOD_LALT   0x04
@@ -10,11 +13,16 @@
 #define KEY_MOD_RALT   0x40
 #define KEY_MOD_RMETA  0x80
 
+enum MODIFIER_KEY {
+    KEY_CTRL = 1,
+    KEY_SHIFT = 2,
+    KEY_ALT = 4,
+};
 
-
-
-
-
+typedef struct {
+    unsigned char usage;
+    unsigned char modifier;
+} KEYMAP;
 
 const KEYMAP m5keymap[194]={
     {0,0},
@@ -248,3 +256,4 @@ const uint8_t reportMap[] = {
   HIDINPUT(1),           0x00,       //   Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
   END_COLLECTION(0)
 };
+#endif

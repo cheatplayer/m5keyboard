@@ -206,7 +206,7 @@ void Exec::execBLEString(const char *text){
     if(isConnected){
         const char *pointer=text;
         while(*pointer){
-            KEYMAP map=keymap[(uint8_t)*pointer];
+            KEYMAP map=m5keymap[(uint8_t)*pointer];
             simulateKey(map);
             vTaskDelay(100/portTICK_PERIOD_MS);
             pointer++;
