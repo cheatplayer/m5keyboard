@@ -58,6 +58,7 @@ int parse(std::string n){
 }
 
 void execLine(std::string line){
+    delay(10);
     if(line.substr(0,3)==">>>"){
         std::vector<std::string> sp=split(line.substr(4),' ');
         int i=0;
