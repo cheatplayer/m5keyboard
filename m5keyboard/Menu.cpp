@@ -106,19 +106,19 @@ void Menu::load(){
     }
 }
 
-Exec *hacktask;
-void Menu::hack(){
+Exec *runscripttask;
+void Menu::runScript(){
   if(isConnected){
-    hacktask= new Exec(record_str);
-    hacktask->start();
-    Display::result("hacking...");
+    runscripttask= new Exec(record_str);
+    runscripttask->start();
+    Display::result("runing script...");
   }else{
-    Display::result("hack fail");  
+    Display::result("run script fail");  
   }
 }
 
-void Menu::hackStop(){
-    hacktask->stop();
-    delete hacktask;
-    Display::result("hack stoped");
+void Menu::runScriptStop(){
+    runscripttask->stop();
+    delete runscripttask;
+    Display::result("run script stoped");
 }

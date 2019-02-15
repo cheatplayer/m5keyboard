@@ -14,8 +14,8 @@ namespace Menu{
     void clear();
     void save();
     void load();
-    void hack();
-    void hackStop();
+    void runScript();
+    void runScriptStop();
     void rm();
     void find();
     void rels();

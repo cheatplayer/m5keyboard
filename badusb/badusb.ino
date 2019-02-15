@@ -66,17 +66,23 @@ void execLine(std::string line){
             Keyboard.press(key);
             i++;
         }
+        delay(10);
         Keyboard.releaseAll();
+        delay(10);
    }else if(line.substr(0,3)=="$$$"){
         int n=atoi(line.substr(4).c_str());
         delay(n);
    }else if(line.substr(0,3)==":::"){
         int key=parse(line.substr(4));
         Keyboard.press(key);
+        delay(10);
         Keyboard.release(key);
+        delay(10);
    }else{
         Keyboard.write(line.c_str(),line.size());
+        delay(10);
         Keyboard.releaseAll();
+        delay(10);
    }
 }
 

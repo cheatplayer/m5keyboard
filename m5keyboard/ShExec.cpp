@@ -228,5 +228,5 @@ void Exec::run(void*){
         execLine(lines[i]);
         i++;
     }
-    Display::result("hack ok");
+    Display::result("run script ok");
 }

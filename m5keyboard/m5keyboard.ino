@@ -22,7 +22,7 @@ const char* menuname[MENULEN]={
     "startBLE",
     "save",
     "load",
-    "hack",
+    "run",
     "halt",
     "rm"
 };
@@ -40,7 +40,7 @@ void (*funcarr[MENULEN])()={
   StartBLEServer,
   Menu::save,
   Menu::load,
-  Menu::hack,
+  Menu::runScript,
   Menu::halt,
   Menu::rm
 };
@@ -49,7 +49,7 @@ void (*funcarrNext[MENULEN])()={
     StopBLEServer,
     Menu::clear,
     Menu::find,
-    Menu::hackStop,
+    Menu::runScriptStop,
     Menu::ls,
     Menu::find
 };
