@@ -8,6 +8,7 @@
 #include "SDCard.h"
 #include "BLEHIDKeyboard.h"
 #include "ShExec.h"
+#include "M5Server.h"
 
 extern bool isConnected;
 
@@ -121,4 +122,18 @@ void Menu::runScriptStop(){
     runscripttask->stop();
     delete runscripttask;
     Display::result("run script stoped");
+}
+
+CheckServerTask *checkservertask;
+void Menu::startSTAMenu(){
+    M5Server::startSTA();
+    checkservertask= new CheckServerTask();
+    checkservertask->start();
+    M5Server::startServer();
+}
+
+void Menu::startAPMenu(){
+    M5Server::scanNetworks();
+    M5Server::startAP();
+    M5Server::startServer();
 }

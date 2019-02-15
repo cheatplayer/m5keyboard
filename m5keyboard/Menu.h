@@ -20,6 +20,8 @@ namespace Menu{
     void find();
     void rels();
     void ls();
+    void startSTAMenu();
+    void startAPMenu();
 }
 
 #endif
