@@ -14,8 +14,8 @@ bool isSTAConnected=false;
 bool isSTAStarted=false;
 bool isAPStarted=false;
 
-const IPAddress apIP(192, 168, 13, 1);
-const char* apSSID = "M5 Wifi";
+const IPAddress apIP(192, 168, 4, 1);
+const char* apSSID = "M5Keyboard AP WiFi";
 String wifi_ssid;
 String wifi_password;
 String ssidstr;

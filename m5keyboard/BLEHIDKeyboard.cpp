@@ -20,7 +20,7 @@ BLEAdvertising *advertising;
 void displayBLEServerStatus()
 {
   if(isConnected){
-    M5.Lcd.fillCircle(10,230,3,GREEN);
+    M5.Lcd.fillCircle(10,230,3,BLUE);
   }else{
     M5.Lcd.fillCircle(10,230,3,RED);
   }

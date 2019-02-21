@@ -28,29 +28,30 @@ typedef struct {
     void (*func)();
 } MenuFunc;
 
-const int MENULEN= 8;
+const int MENULEN= 9;
 MenuFunc menufuncA[MENULEN]={
-    {"BLEKeyboard",StartBLEServer},
+    {"BLE",StartBLEServer},
     {"save",Menu::save},
     {"load",Menu::load},
     {"run",Menu::runScript},
     {"halt",Menu::halt},
     {"rm",Menu::rm},
     {"stopBLE",StopBLEServer},
-    {"startAP",Menu::startAPMenu}
+    {"STA",Menu::startSTAMenu},
+    {"AP",Menu::startAPMenu}
 };
 
 MenuFunc menufuncB[MENULEN]={
-    {"STAServer",Menu::startSTAMenu},
+    {"Client",Menu::startClientMenu},
     {"clear",Menu::clear},
     {"find",Menu::find},
     {"cancel",Menu::runScriptStop},
     {"ls",Menu::ls},
     {"find",Menu::find},
-    {"stopSTA",M5Server::stopSTA},
-    {"stopAP",M5Server::stopAP}
+    {"stopClient",Menu::stopClientMenu},
+    {"stop",M5Server::stopSTA},
+    {"stop",M5Server::stopAP}
 };
-
 
 int menuindex= 0;
 

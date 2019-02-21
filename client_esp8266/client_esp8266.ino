@@ -14,8 +14,8 @@
 #define debug false
 
 /* ============= CHANGE WIFI CREDENTIALS ============= */
-const char *ssid = "M5 Client";
-const char *password = "quackquack"; //min 8 chars
+const char *ssid = "TP-LINK_M5CL";
+const char *password = "cheatplayer"; //min 8 chars
 /* ============= ======================= ============= */
 
 AsyncWebServer server(80);

@@ -9,6 +9,7 @@
 #include "BLEHIDKeyboard.h"
 #include "ShExec.h"
 #include "M5Server.h"
+#include "M5Client.h"
 
 extern bool isConnected;
 
@@ -136,4 +137,17 @@ void Menu::startAPMenu(){
     M5Server::scanNetworks();
     M5Server::startAP();
     M5Server::startServer();
+}
+
+bool isClientConnected=false;
+
+void Menu::startClientMenu(){
+    TheClient::StartHTTPClient("TP-LINK_M5CL","cheatplayer");
+    M5.Lcd.fillCircle(10,230,3,GREEN);
+    isClientConnected=true;
+}
+
+void Menu::stopClientMenu(){
+    M5.Lcd.fillCircle(10,230,3,RED);
+    isClientConnected=false;
 }
