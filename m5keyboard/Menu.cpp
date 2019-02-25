@@ -125,10 +125,9 @@ void Menu::runScriptStop(){
     Display::result("run script stoped");
 }
 
-CheckServerTask *checkservertask;
 void Menu::startSTAMenu(){
     M5Server::startSTA();
-    checkservertask= new CheckServerTask();
+    CheckServerTask *checkservertask= new CheckServerTask();
     checkservertask->start();
     M5Server::startServer();
 }
@@ -139,14 +138,11 @@ void Menu::startAPMenu(){
     M5Server::startServer();
 }
 
-bool isClientConnected=false;
-
 void Menu::startClientMenu(){
     TheClient::StartHTTPClient("TP-LINK_M5CL","cheatplayer");
-    M5.Lcd.fillCircle(10,230,3,GREEN);
-    isClientConnected=true;
 }
 
+extern bool isClientConnected;
 void Menu::stopClientMenu(){
     M5.Lcd.fillCircle(10,230,3,RED);
     isClientConnected=false;

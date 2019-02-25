@@ -1,14 +1,18 @@
 // 2019/2/21 by cp
 
 #include <WiFi.h>
-#include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include "M5Client.h"
+#include "M5Server.h"
 
-WiFiMulti wifiMulti;
+bool isClientConnected=false;
 
 void TheClient::StartHTTPClient(String ssid,String passwd){
-    wifiMulti.addAP(ssid.c_str(),passwd.c_str());
+    WiFi.begin(ssid.c_str(), passwd.c_str());
+    WiFi.mode(WIFI_MODE_STA);
+    isClientConnected=true;
+    CheckServerTask *checkservertask= new CheckServerTask();
+    checkservertask->start();
 }
 
 void RequestTask::setRequest(String urlstr,String querystr,void (*func)(int code,String payload)){
@@ -22,7 +26,7 @@ RequestTask::RequestTask(String url,String query,void (*func)(int code,String pa
 }
 
 void RequestTask::run(void*){
- if((wifiMulti.run() == WL_CONNECTED)) {
+ if(isClientConnected) {
         HTTPClient http;
         http.begin(url+"?"+query); //HTTP
         // start connection and send HTTP header

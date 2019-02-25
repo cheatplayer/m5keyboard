@@ -9,6 +9,8 @@
 namespace M5Server{
     void displayServerStatus();
     String makePage(String title, String contents);
+    String jumpPath(String path);
+    String errorPage(String code,String msg);
     String urlDecode(String input);
     void startServer();
     void startAP();
@@ -16,6 +18,7 @@ namespace M5Server{
     void startSTA();
     void stopSTA();
     void scanNetworks();
+    String optionSD(std::vector<std::string> findfiles);
 };
 
 class CheckServerTask:public Task{
