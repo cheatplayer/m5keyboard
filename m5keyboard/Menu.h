@@ -22,6 +22,8 @@ namespace Menu{
     void ls();
     void startSTAMenu();
     void startAPMenu();
+    void startClientMenu();
+    void stopClientMenu();
 }
 
 #endif
