@@ -41,7 +41,7 @@ void Display::menu(const char* menuname){
 
 void Display::result(const char* result){
     M5.Lcd.fillRect(220,220,100,20,0x293573);
-    m5.Lcd.setCursor(225,222);
+    M5.Lcd.setCursor(225,222);
     M5.Lcd.print(result);
 }
 
