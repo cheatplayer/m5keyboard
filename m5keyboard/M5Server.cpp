@@ -109,16 +109,16 @@ void M5Server::startServer(){
         //load
         s+="<h3>Load</h3><form method='get' action='/main'>file:";
         s+=M5Server::optionSD(findfiles);
-        s+="<input type='submit'></form>";
+        s+="<br><input type='submit'></form>";
         //save
         s+="<h3>Save</h3><form method='get' action='/sdsave'>file:";
-        s+="<textarea name='text'></textarea>";
-        s+="<input name='filename'>";
+        s+="<input type='text' name='filename' value='/'><br>";
+        s+="<textarea rows='20' name='text'></textarea><br>";
         s+="<input type='submit'></form>";
         //rm
         s+="<h3>RM</h3><form method='get' action='/sdrm'>file:";
         s+=M5Server::optionSD(findfiles);
-        s+="<input type='submit'></form>";
+        s+="<br><input type='submit'></form>";
         //back
         s+="<p><a href='/'>home</a></p>";
         webServer.send(200,"text/html",M5Server::makePage("SD Card",s));
@@ -136,21 +136,17 @@ void M5Server::startServer(){
 
     webServer.on("/main",[](){
         String filename = M5Server::urlDecode(webServer.arg("filename"));
+        String loadfile=String(SDCard::read(filename.c_str()).c_str());
 
         String s="<h1>M5Keyboard Main</h1>";
-        std::vector<std::string> findfiles;
-        findfiles=SDCard::ls("/");
 
         //main
-        s+="<form method='get' name='load' action='/main'></form>";
-        s+="<form method='get' name='save' action='/sdsave'></form>";
-        s+="<form method='get' name='run' action='/run'>file:"+filename;
-        s+=M5Server::optionSD(findfiles);
-        String loadfile=String(SDCard::read(filename.c_str()).c_str());
-        s+="<textarea name='text'>"+loadfile+"</textarea>";
-        s+="<input type='submit' form='load' value='load'>";
-        s+="<input type='submit' form='save' value='save'>";
-        s+="<input type='submit' form='run' value='run'>";
+        s+="<form method='get' name='f'>file:"+filename;
+        s+="<br><input type='text' name='filename' value='"+filename+"'><br>";
+        s+="<textarea rows='20' name='text'>"+loadfile+"</textarea><br>";
+        s+="<button onclick=\"f.action='/main';f.submit()\">load</button>";
+        s+="<button onclick=\"f.action='/sdsave';f.submit()\">save</button>";
+        s+="<button onclick=\"f.action='/run';f.submit()\">run</button>";
         s+="</form>";
 
         webServer.send(200,"text/html",M5Server::makePage("M5Keyboard Main",s));
