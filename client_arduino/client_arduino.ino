@@ -123,20 +123,32 @@ bool load(const char *filename){
 void setup(){
 
     pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
 
     Serial.begin(57200);
     ExternSerial.begin(57200);
-    pinMode(13,OUTPUT);
-    digitalWrite(13,HIGH);
     Keyboard.begin();
 
     if(!SD.begin(4)){
         digitalWrite(LED_BUILTIN,LOW);
     }
     
-    load(DEFAULT_FILE_NAME.c_str());
-    digitalWrite(LED_BUILTIN,LOW);
+    bool dfresult=load(DEFAULT_FILE_NAME.c_str());
+    if(!dfresult){
+        digitalWrite(LED_BUILTIN,HIGH);
+        delay(1000);
+        digitalWrite(LED_BUILTIN,LOW);
+    }
+
+    load("QQQ");
+    SDCard::rm("QQQ");
+    load("www");
+    SDCard::rm("www");
+    load("/OOO");
+    SDCard::rm("/OOO");
+    load("/ppp");
+    SDCard::rm("/ppp");
+
+
 }
 
 String originStr = "";
@@ -148,19 +160,36 @@ void loop(){
     originStr = ExternSerial.readStringUntil("END");
     String tag=originStr.substring(0,3);
     if(tag==":$>"){
+        //12345678901234567
+        //:$> SAVE filename text
         String cmd=originStr.substring(4,8);
         String query=originStr.substring(9);
         Serial.println(cmd);
-        Serial.println(query);
+        int sp=query.indexOf("/");
+        String filename=query.substring(0,sp);
+        Serial.println(filename);
         if(cmd=="RMRM"){
-            SDCard::rm(query.c_str());
+            bool rmresult=SDCard::rm(filename.c_str());
+            if(!rmresult){
+                digitalWrite(LED_BUILTIN, HIGH);
+                delay(1000);
+                digitalWrite(LED_BUILTIN, LOW);
+            }
         }else if(cmd=="LOAD"){
-            load(query.c_str());
+            bool loadresult=load(filename.c_str());
+            if(!loadresult){
+                digitalWrite(LED_BUILTIN, HIGH);
+                delay(1000);
+                digitalWrite(LED_BUILTIN, LOW);
+            }
         }else if(cmd=="SAVE"){
-            int sp=query.indexOf(" ");
-            String filename=query.substring(0,sp);
-            String text=query.substring(0,sp+1);
-            SDCard::write(filename.c_str(),text.c_str());
+            String text=query.substring(sp+1);
+            bool saveresult=SDCard::write(filename.c_str(),text.c_str());
+            if(!saveresult){
+                digitalWrite(LED_BUILTIN, HIGH);
+                delay(1000);
+                digitalWrite(LED_BUILTIN, LOW);
+            }
         }
         originStr = "";
     }else{
@@ -171,8 +200,6 @@ void loop(){
   }
   
   if(bufferStr.length() > 0){
-    
-    // bufferStr.replace("\n\r","\r");
     
     while(bufferStr.length() > 0){
       int latest_return = bufferStr.indexOf("\r");

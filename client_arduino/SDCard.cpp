@@ -15,6 +15,7 @@ std::string SDCard::read(const char *path){
 }
 
 bool SDCard::write(const char *path,const char *text){
+    SDCard::rm(path);
     File f=SD.open(path,FILE_WRITE);
     if(f){
         f.println(text);
