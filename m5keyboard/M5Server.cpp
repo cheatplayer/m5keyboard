@@ -55,8 +55,14 @@ void M5Server::displayServerStatus(){
 void M5Server::startServer(){
     webServer.on("/", []() {
       String s = "<h1>M5Keyboard</h1><ul>";
-      s+="<li><a href=\"/settings\">settings</li>";
-      s+="<li>setsta</li><li>resetsta</li>";
+      s+="<li><a href='/sd'>sd</a></li>";
+      s+="<li><a href='/main'>main</a> ? filename</li>";
+      s+="<li><a href=\"/settings\">settings</a></li>";
+      s+="<li><a href='/resetsta'>resetsta</a></li>";
+      s+="<li>sdrm ? filename</li>";
+      s+="<li>sdsave ? filename & text</li>";
+      s+="<li>run ? filename | text</li>";
+      s+="<li>setsta ? ssid & pass</li>";
       s+="</ul>";
       webServer.send(200, "text/html", M5Server::makePage("STA mode", s));
     });
@@ -148,6 +154,7 @@ void M5Server::startServer(){
         s+="<button onclick=\"f.action='/sdsave';f.submit()\">save</button>";
         s+="<button onclick=\"f.action='/run';f.submit()\">run</button>";
         s+="</form>";
+        s+="<p><a href='/'>home</a></p>";
 
         webServer.send(200,"text/html",M5Server::makePage("M5Keyboard Main",s));
     });
@@ -155,16 +162,25 @@ void M5Server::startServer(){
     webServer.on("/run",[](){
         String filename = M5Server::urlDecode(webServer.arg("filename"));
         String text = M5Server::urlDecode(webServer.arg("text"));
-
-        const char *temp = const_cast<char*>(text.c_str());
-        record_str=temp;
-        Menu::runScript();
+        std:string loadfile=SDCard::read(filename.c_str());
 
         String s="<h1>Running</h1>";
-        s+="<h3>"+filename+"</h3>";
-        s+="<pre>"+text+"</pre>";
-
-        webServer.send(200,"text/html",M5Server::makePage("Running",s));
+        if(text!=""){
+            const char *temp = const_cast<char*>(text.c_str());          
+            record_str=temp;
+            Menu::runScript();
+            s+="<pre>"+text+"</pre>";
+            s+="<p><a href='/'>home</a></p>";
+            webServer.send(200,"text/html",M5Server::makePage("Running",s));
+        }else if(loadfile!=""){
+            record_str=loadfile;
+            Menu::runScript();
+            s+="<h3>File:"+filename+"</h3>";
+            s+="<p><a href='/'>home</a></p>";
+            webServer.send(200,"text/html",M5Server::makePage("Running",s));
+        }else{
+            webServer.send(200,"text/html",M5Server::errorPage("Run","<p>run fail.Check query filename or text</p>"));
+        }
     });
 
     webServer.on("/sdsave",[](){
@@ -295,8 +311,8 @@ String M5Server::errorPage(String code,String msg){
 
 String M5Server::urlDecode(String input) {
   String s = input;
-  s.replace("%20", " ");
   s.replace("+", " ");
+  s.replace("%20", " ");
   s.replace("%21", "!");
   s.replace("%22", "\"");
   s.replace("%23", "#");
@@ -306,14 +322,12 @@ String M5Server::urlDecode(String input) {
   s.replace("%27", "\'");
   s.replace("%28", "(");
   s.replace("%29", ")");
-  s.replace("%30", "*");
-  s.replace("%31", "+");
-  s.replace("%2C", ",");
+  s.replace("%2B", "+");
   s.replace("%2E", ".");
   s.replace("%2F", "/");
   s.replace("%2C", ",");
   s.replace("%3A", ":");
-  s.replace("%3A", ";");
+  s.replace("%3B", ";");
   s.replace("%3C", "<");
   s.replace("%3D", "=");
   s.replace("%3E", ">");
@@ -323,7 +337,13 @@ String M5Server::urlDecode(String input) {
   s.replace("%5C", "\\");
   s.replace("%5D", "]");
   s.replace("%5E", "^");
-  s.replace("%5F", "-");
+  s.replace("%5F", "_");
   s.replace("%60", "`");
+  s.replace("%7B", "{");
+  s.replace("%7C", "|");
+  s.replace("%7D", "}");
+  s.replace("%0D", "\r");
+  s.replace("%0A", "\n");
+  // s.replace("%09", "\t");
   return s;
 }

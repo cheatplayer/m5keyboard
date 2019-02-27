@@ -6,13 +6,12 @@
 #include <SPI.h>
 #include <SD.h>
 #include <ArduinoSTL.h>
+#include "SDCard.h"
 
 std::string DEFAULT_FILE_NAME = "DS_Store";
 
 #define ExternSerial Serial1
 
-String bufferStr = "";
-String last = "";
 
 int defaultDelay = 10;
 
@@ -100,6 +99,27 @@ void execLine(std::string line){
    }
 }
 
+bool load(const char *filename){
+    File f=SD.open(filename);
+    if(f){
+        std::string line="";
+        while(f.available()){
+            char k=f.read();
+            if(k=='\r'){
+                execLine(line);
+                line="";
+            }else{
+                line+=k;
+            }
+        }
+        execLine(line);
+        f.close();
+        return true;
+    }else{
+        return false;
+    }
+}
+
 void setup(){
 
     pinMode(LED_BUILTIN, OUTPUT);
@@ -114,29 +134,40 @@ void setup(){
     if(!SD.begin(4)){
         digitalWrite(LED_BUILTIN,LOW);
     }
-    File f=SD.open(DEFAULT_FILE_NAME.c_str());
-    if(f){
-        std::string line="";
-        while(f.available()){
-            char k=f.read();
-            if(k=='\r'){
-                execLine(line);
-                line="";
-            }else{
-                line+=k;
-            }
-        }
-        execLine(line);
-        f.close();
-        Keyboard.end();
-    }
+    
+    load(DEFAULT_FILE_NAME.c_str());
     digitalWrite(LED_BUILTIN,LOW);
 }
 
+String originStr = "";
+String bufferStr = "";
+String last = "";
+
 void loop(){
    if(ExternSerial.available()) {
-    bufferStr = ExternSerial.readStringUntil("END");
-    Serial.println(bufferStr);
+    originStr = ExternSerial.readStringUntil("END");
+    String tag=originStr.substring(0,3);
+    if(tag==":$>"){
+        String cmd=originStr.substring(4,8);
+        String query=originStr.substring(9);
+        Serial.println(cmd);
+        Serial.println(query);
+        if(cmd=="RMRM"){
+            SDCard::rm(query.c_str());
+        }else if(cmd=="LOAD"){
+            load(query.c_str());
+        }else if(cmd=="SAVE"){
+            int sp=query.indexOf(" ");
+            String filename=query.substring(0,sp);
+            String text=query.substring(0,sp+1);
+            SDCard::write(filename.c_str(),text.c_str());
+        }
+        originStr = "";
+    }else{
+        bufferStr = originStr;
+        Serial.println(bufferStr);
+        originStr = "";
+    }
   }
   
   if(bufferStr.length() > 0){

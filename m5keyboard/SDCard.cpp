@@ -49,7 +49,6 @@ void SDCard::mount(){
 
 std::vector<std::string> SDCard::ls(const char *path){
     std::vector<std::string> v;
-    std::string p=path;
     if(!isMounted){
         return v;
     }
@@ -67,6 +66,7 @@ std::vector<std::string> SDCard::ls(const char *path){
         }
         file=root.openNextFile();
     }
+    root.close();
     return v;
 }
 
