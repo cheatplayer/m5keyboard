@@ -151,7 +151,8 @@ String loopfilename="";
 
 void loop(){
    if(ExternSerial.available()) {
-    originStr = ExternSerial.readStringUntil("$^C");
+    originStr = ExternSerial.readStringUntil(255);
+    Serial.println(originStr);
     String tag=originStr.substring(0,3);
     if(tag=="^B$"){
         //12345678901234567
