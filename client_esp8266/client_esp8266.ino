@@ -18,6 +18,9 @@ const char *ssid = "TP-LINK_M5CL";
 const char *password = "cheatplayer"; //min 8 chars
 /* ============= ======================= ============= */
 
+String lstext="";
+String readtext="";
+
 AsyncWebServer server(80);
 FSInfo fs_info;
 
@@ -369,11 +372,19 @@ void loop() {
       runLine = true;
 	}
 	else {
-		String command = (char)answer + Serial.readStringUntil('\n');
-		command.replace("\r", "");
-		if(command == "reset") {
-			settings.reset();
-			shouldReboot = true;
+		String originStr = (char)answer + Serial.readStringUntil("$^C");
+        String tag=originStr.substring(0,3);
+		if( tag== "^B$") {
+            String cmd=originStr.substring(4,8);
+            String query=originStr.substring(9);
+            if(cmd=="REST"){
+                settings.reset();
+                shouldReboot = true;
+            }else if(cmd=="READ"){
+                readtext=query;
+            }else if(cmd=="LSLS"){
+                lstext=query;
+            }
 		}
 	}
   }

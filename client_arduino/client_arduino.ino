@@ -139,34 +139,31 @@ void setup(){
         digitalWrite(LED_BUILTIN,LOW);
     }
 
-    load("QQQ");
-    SDCard::rm("QQQ");
-    load("www");
-    SDCard::rm("www");
-    load("/OOO");
-    SDCard::rm("/OOO");
-    load("/ppp");
-    SDCard::rm("/ppp");
-
-
 }
 
 String originStr = "";
 String bufferStr = "";
 String last = "";
+String recordfilename="";
+String repeatfilename="";
+int repeattimes=0;
+String loopfilename="";
 
 void loop(){
    if(ExternSerial.available()) {
-    originStr = ExternSerial.readStringUntil("END");
+    originStr = ExternSerial.readStringUntil("$^C");
     String tag=originStr.substring(0,3);
-    if(tag==":$>"){
+    if(tag=="^B$"){
         //12345678901234567
         //:$> SAVE filename text
         String cmd=originStr.substring(4,8);
         String query=originStr.substring(9);
         Serial.println(cmd);
         int sp=query.indexOf("/");
-        String filename=query.substring(0,sp);
+        String filename="";
+        if(sp!=-1){
+            filename=query.substring(0,sp);
+        }
         Serial.println(filename);
         if(cmd=="RMRM"){
             bool rmresult=SDCard::rm(filename.c_str());
@@ -190,11 +187,41 @@ void loop(){
                 delay(1000);
                 digitalWrite(LED_BUILTIN, LOW);
             }
+        }else if(cmd=="RECD"){
+            recordfilename=filename;
+        }else if(cmd=="REND"){
+            recordfilename="";
+        }else if(cmd=="REPT"){
+            repeatfilename=filename;
+            query=query.substring(sp+1);
+            int spp=query.indexOf("/");
+            if(spp!=-1){
+                String qtimes=query.substring(0,sp);
+                repeattimes=atoi(qtimes.c_str());
+            }else{
+                digitalWrite(LED_BUILTIN, HIGH);
+                delay(1000);
+                digitalWrite(LED_BUILTIN, LOW);
+            }            
+        }else if(cmd=="LOOP"){
+            loopfilename=filename;
+        }else if(cmd=="LEND"){
+            loopfilename="";
+            repeatfilename="";
+            repeattimes=0;
+        }else if(cmd=="READ"){
+            std::string readtext=SDCard::read(filename.c_str());
+            ExternSerial.write(("^B$ READ "+readtext).c_str());
+        }else if(cmd=="LSLS"){
+            std::string lstext=SDCard::lsStr("/");
+            ExternSerial.write(("^B$ LSLS "+lstext).c_str());
         }
         originStr = "";
     }else{
         bufferStr = originStr;
-        Serial.println(bufferStr);
+        if(recordfilename!=""){
+            SDCard::append(recordfilename.c_str(),originStr.c_str());
+        }
         originStr = "";
     }
   }
@@ -218,5 +245,14 @@ void loop(){
     bufferStr = "";
     ExternSerial.write(0x99);
     Serial.println("done");
+  }
+
+  if(repeatfilename!="" && repeattimes>0){
+    load(repeatfilename.c_str());
+    repeattimes--;
+  }
+
+  if(loopfilename!=""){
+    load(loopfilename.c_str());
   }
 }

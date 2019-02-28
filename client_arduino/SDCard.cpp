@@ -26,6 +26,17 @@ bool SDCard::write(const char *path,const char *text){
     }
 }
 
+bool SDCard::append(const char *path,const char *text){
+    File f=SD.open(path,FILE_WRITE);
+    if(f){
+        f.println(text);
+        f.close();
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool SDCard::rm(const char *path){
     if(SD.exists(path)){
         SD.remove(path);
@@ -48,6 +59,26 @@ std::vector<std::string> SDCard::ls(const char *path){
             // v.push_back(filename+"/");
         }else{
             v.push_back(filename);
+        }
+        file=root.openNextFile();
+    }
+    root.close();
+    return v;
+}
+
+std::string SDCard::lsStr(const char *path){
+    std::string v="";
+    File root = SD.open(path);
+    if(!root||!root.isDirectory()){
+        return v;
+    }
+    File file=root.openNextFile();
+    while(file){
+        std::string filename=file.name();
+        if(file.isDirectory()){
+            // v.push_back(filename+"/");
+        }else{
+            v+=filename+"\n";
         }
         file=root.openNextFile();
     }
