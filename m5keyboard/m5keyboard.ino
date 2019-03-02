@@ -8,6 +8,7 @@
 #include "Menu.h"
 #include "Display.h"
 #include "M5Server.h"
+#include "M5Client.h"
 #include "WebServer.h"
 #include <Preferences.h>
 
@@ -98,6 +99,7 @@ void loop() {
         Display::print((char)key_val);
         Menu::record((char)key_val);
         inputKeyValue((int)key_val);
+        TheClient::sendClient(key_val);
       }
     }
   }

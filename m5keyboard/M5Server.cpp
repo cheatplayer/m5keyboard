@@ -14,6 +14,7 @@
 #include "M5Client.h"
 #include "Menu.h"
 
+
 bool isSTAConnected=false;
 bool isSTAStarted=false;
 bool isAPStarted=false;
@@ -162,7 +163,7 @@ void M5Server::startServer(){
     webServer.on("/run",[](){
         String filename = M5Server::urlDecode(webServer.arg("filename"));
         String text = M5Server::urlDecode(webServer.arg("text"));
-        std:string loadfile=SDCard::read(filename.c_str());
+        std::string loadfile=SDCard::read(filename.c_str());
 
         String s="<h1>Running</h1>";
         if(text!=""){
