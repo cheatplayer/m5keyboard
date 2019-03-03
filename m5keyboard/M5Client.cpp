@@ -5,6 +5,7 @@
 #include "M5Client.h"
 #include "M5Server.h"
 #include "ShExec.h"
+#include "Display.h"
 
 bool isClientConnected=false;
 
@@ -61,7 +62,6 @@ std::string TheClient::urlEncode(std::string input) {
   else if(input== "!")return "%21";
   else if(input== "\"")return "%22";
   else if(input== "#")return "%23";
-  else if(input== "$")return "%24";
   else if(input== "%")return "%25";
   else if(input== "&")return "%26";
   else if(input== "\'")return "%27";
@@ -96,11 +96,13 @@ std::string TheClient::urlEncode(std::string input) {
 void clientcallback(int code,String payload){
     Serial.println(code);
     Serial.println(payload);
+    Display::result(payload.c_str());
 }
 
 void TheClient::sendClient(char key_val){
     if(isClientConnected){
         std::string text=Sh::stringify(key_val);
+        Serial.println(text.c_str());
         std::string query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/input",query,clientcallback);
