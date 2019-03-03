@@ -23,8 +23,8 @@ void RequestTask::setRequest(String urlstr,String querystr,void (*func)(int code
 }
 
 RequestTask::RequestTask(std::string url,std::string query,void (*func)(int code,String payload)){
-    String turl=url.c_str();
-    String tquery=url.c_str();
+    String turl=String()+url.c_str();
+    String tquery=String()+query.c_str();
     setRequest(turl,tquery,func);
 }
 
@@ -36,8 +36,9 @@ void RequestTask::run(void*){
  if(isClientConnected) {
         HTTPClient http;
         http.begin(url+"?"+query); //HTTP
+        Serial.println(url+"?"+query);
         // start connection and send HTTP header
-        int httpCode = http.POST("");
+        int httpCode = http.GET();
         // httpCode will be negative on error
         if(httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
@@ -92,17 +93,17 @@ std::string TheClient::urlEncode(std::string input) {
   return input;
 }
 
-        void callback(int code,String payload){
-
-        }
+void clientcallback(int code,String payload){
+    Serial.println(code);
+    Serial.println(payload);
+}
 
 void TheClient::sendClient(char key_val){
     if(isClientConnected){
-
         std::string text=Sh::stringify(key_val);
-        std::string query="q="+TheClient::urlEncode(text);
+        std::string query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
-        reqtask=new RequestTask("http://192.168.4.1/input",query,callback);
+        reqtask=new RequestTask("http://192.168.4.1/input",query,clientcallback);
         reqtask->start();
     }
 }

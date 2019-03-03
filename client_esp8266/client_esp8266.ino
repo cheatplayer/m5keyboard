@@ -254,72 +254,79 @@ void setup() {
   server.on("/cmd",HTTP_POST,[](AsyncWebServerRequest *request){
     String q=request->arg("q");
     Serial.println("^B$ "+q);
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", q);
   });
 
   server.on("/input",HTTP_POST,[](AsyncWebServerRequest *request){
-    Serial.println(request->arg("q"));
-    request->send(200, "text/plain", "true");
+    String q=request->arg("q");
+    Serial.println(q);
+    request->send(200, "text/plain", q);
+  });
+
+  server.on("/input",HTTP_GET,[](AsyncWebServerRequest *request){
+    String q=request->arg("q");
+    Serial.println(q);
+    request->send(200, "text/plain", q);
   });
 
   server.on("/sdsave",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     String text=request->arg("text");
     Serial.println("^B$ SAVE "+filename+"/"+text);
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename+"/"+text);
   });
 
   server.on("/sdload",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     Serial.println("^B$ LOAD "+filename+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename);
   });
 
   server.on("/sdrm",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     Serial.println("^B$ RMRM "+filename+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename);
   });
 
   server.on("/record",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     Serial.println("^B$ RECD "+filename+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename);
   });
 
   server.on("/recordend",HTTP_GET,[](AsyncWebServerRequest *request){
     Serial.println("^B$ REND ");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", "recordend");
   });
 
   server.on("/repeat",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     String times=request->arg("times");
     Serial.println("^B$ REPT "+filename+"/"+times+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename+"/"+times);
   });
 
   server.on("/loop",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     Serial.println("^B$ LOOP "+filename+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename);
   });
 
   server.on("/loopend",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     Serial.println("^B$ LEND "+filename+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", filename);
   });
 
   server.on("/sdread",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     Serial.println("^B$ READ "+filename+"/");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", readtext);
   });
 
   server.on("/sdls",HTTP_POST,[](AsyncWebServerRequest *request){
     Serial.println("^B$ LSLS ");
-    request->send(200, "text/plain", "true");
+    request->send(200, "text/plain", lstext);
   });
 
   server.on("/save", HTTP_POST, [](AsyncWebServerRequest *request) {
