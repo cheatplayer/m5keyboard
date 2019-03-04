@@ -56,7 +56,7 @@ void RequestTask::run(void*){
     }
 }
 
-std::string TheClient::urlEncode(std::string input) {
+std::string TheClient::urlEncode(std::string input) {//replace
   if(input== " ")return "+";
   else if(input== " ")return "%20";
   else if(input== "!")return "%21";
@@ -101,6 +101,7 @@ void clientcallback(int code,String payload){
 
 void TheClient::sendClient(std::string text){
     if(isClientConnected){
+        Serial.println(text);
         std::string query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/input",query,clientcallback);
@@ -110,6 +111,7 @@ void TheClient::sendClient(std::string text){
 
 void TheClient::sendCmd(std::string text){
     if(isClientConnected){
+        Serial.println(text);
         std::string query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/cmd",query,clientcallback);
