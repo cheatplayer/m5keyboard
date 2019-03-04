@@ -16,6 +16,8 @@ namespace Menu{
     void load();
     void runScript();
     void runScriptStop();
+    void loop();
+    void loopStop();
     void rm();
     void find();
     void rels();
@@ -24,6 +26,8 @@ namespace Menu{
     void startAPMenu();
     void startClientMenu();
     void stopClientMenu();
+    void clientCmd();
+    void sendClientCmd();
 }
 
 #endif

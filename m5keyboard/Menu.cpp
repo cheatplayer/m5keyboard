@@ -12,6 +12,10 @@
 #include "M5Client.h"
 
 extern bool isConnected;
+extern void inputKeyValue(int key_val);
+extern bool isClientConnected;
+std::string clientcmd="";
+bool isclientcmd=false;
 
 void Menu::halt(){
     M5.powerOFF();
@@ -19,9 +23,26 @@ void Menu::halt(){
 
 std::string record_str="";
 void Menu::record(char key_val){
-    int i=(int)key_val;
-    std::string sh=Sh::stringify(key_val);
-    record_str+=sh;
+    if(isclientcmd){
+        clientcmd+=key_val;
+    }else{
+        int i=(int)key_val;
+        inputKeyValue(i);
+        std::string sh=Sh::stringify(key_val);
+        record_str+=sh;
+        TheClient::sendClient(sh);
+    }
+
+}
+
+void Menu::clientCmd(){
+    isclientcmd=true;
+}
+
+void Menu::sendClientCmd(){
+    TheClient::sendCmd(clientcmd);
+    clientcmd="";
+    isclientcmd=false;
 }
 
 void Menu::clear(){
@@ -114,6 +135,8 @@ void Menu::runScript(){
     runscripttask= new Exec(record_str);
     runscripttask->start();
     Display::result("runing script...");
+  }else if(isClientConnected){
+    TheClient::sendClient(record_str);
   }else{
     Display::result("run script fail");  
   }
@@ -123,6 +146,29 @@ void Menu::runScriptStop(){
     runscripttask->stop();
     delete runscripttask;
     Display::result("run script stoped");
+}
+
+void Menu::loop(){
+  if(isConnected){
+    runscripttask= new Exec(record_str);
+    runscripttask->isloop=true;
+    runscripttask->start();
+    Display::result("loop script...");
+  }else if(isClientConnected){
+    TheClient::sendCmd("SAVE m5loop/"+record_str);
+    delay(1000);
+    TheClient::sendCmd("LOOP m5loop/");
+  }else{
+    Display::result("loop script fail");  
+  }
+}
+
+void Menu::loopStop(){
+    runscripttask->isloop=false;
+    runscripttask->stop();
+    delete runscripttask;
+    Display::result("loop script stoped");
+    TheClient::sendCmd("LEND ");
 }
 
 void Menu::startSTAMenu(){

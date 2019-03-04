@@ -228,5 +228,9 @@ void Exec::run(void*){
         execLine(lines[i]);
         i++;
     }
-    Display::result("run script ok");
+    if(this->isloop){
+        this->start();
+    }else{
+        Display::result("run script ok");
+    }
 }

@@ -39,7 +39,7 @@ void RequestTask::run(void*){
         http.begin(url+"?"+query); //HTTP
         Serial.println(url+"?"+query);
         // start connection and send HTTP header
-        int httpCode = http.GET();
+        int httpCode = http.POST("");
         // httpCode will be negative on error
         if(httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
@@ -99,13 +99,20 @@ void clientcallback(int code,String payload){
     Display::result(payload.c_str());
 }
 
-void TheClient::sendClient(char key_val){
+void TheClient::sendClient(std::string text){
     if(isClientConnected){
-        std::string text=Sh::stringify(key_val);
-        Serial.println(text.c_str());
         std::string query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/input",query,clientcallback);
+        reqtask->start();
+    }
+}
+
+void TheClient::sendCmd(std::string text){
+    if(isClientConnected){
+        std::string query="q="+TheClient::urlEncode(text)+"&";
+        RequestTask *reqtask;
+        reqtask=new RequestTask("http://192.168.4.1/cmd",query,clientcallback);
         reqtask->start();
     }
 }

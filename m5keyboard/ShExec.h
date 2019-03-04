@@ -22,6 +22,7 @@ class Exec:public Task
 public:
     std::vector<std::string> lines;
     int length=0;
+    bool isloop=false;
     Exec(std::string text);
     Exec();
     void setSplit(std::string text);

@@ -6,8 +6,9 @@
 
 namespace TheClient{
     void StartHTTPClient(String ssid,String passwd);
-    void sendClient(char key_val);
+    void sendClient(std::string text);
     std::string urlEncode(std::string input);
+    void sendCmd(std::string text);
 }
 
 class RequestTask:public Task{

@@ -17,7 +17,6 @@
 
 extern void StartBLEServer();
 extern void StopBLEServer();
-extern void inputKeyValue(int key_val);
 
 extern bool isAPStarted;
 extern bool isSTAConnected;
@@ -29,13 +28,15 @@ typedef struct {
     void (*func)();
 } MenuFunc;
 
-const int MENULEN= 9;
+const int MENULEN= 11;
 MenuFunc menufuncA[MENULEN]={
     {"BLE",StartBLEServer},
     {"save",Menu::save},
     {"load",Menu::load},
     {"run",Menu::runScript},
     {"halt",Menu::halt},
+    {"loop",Menu::loop},
+    {"cmd",Menu::clientCmd},
     {"rm",Menu::rm},
     {"stopBLE",StopBLEServer},
     {"STA",Menu::startSTAMenu},
@@ -48,6 +49,8 @@ MenuFunc menufuncB[MENULEN]={
     {"find",Menu::find},
     {"cancel",Menu::runScriptStop},
     {"ls",Menu::ls},
+    {"stop",Menu::loopStop},
+    {"send",Menu::sendClientCmd},
     {"find",Menu::find},
     {"stopClient",Menu::stopClientMenu},
     {"stop",M5Server::stopSTA},
@@ -98,8 +101,6 @@ void loop() {
       if(key_val != 0) {
         Display::print((char)key_val);
         Menu::record((char)key_val);
-        inputKeyValue((int)key_val);
-        TheClient::sendClient(key_val);
       }
     }
   }
