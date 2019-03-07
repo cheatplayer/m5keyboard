@@ -102,7 +102,7 @@ void clientcallback(int code,String payload){
 
 void TheClient::sendClient(std::string text){
     if(isClientConnected){
-        Serial.println(text.c_str());
+        // Serial.println(text.c_str());
         String t=String()+text.c_str();
         String query="q="+TheClient::urlEncode(t)+"&";
         RequestTask *reqtask;
@@ -113,7 +113,7 @@ void TheClient::sendClient(std::string text){
 
 void TheClient::sendCmd(std::string text){
     if(isClientConnected){
-        Serial.println(text.c_str());
+        // Serial.println(text.c_str());
         String cmd=String()+text.c_str();
         String query="q="+TheClient::urlEncode(cmd)+"&";
         RequestTask *reqtask;
