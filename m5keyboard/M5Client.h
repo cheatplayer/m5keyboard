@@ -7,7 +7,7 @@
 namespace TheClient{
     void StartHTTPClient(String ssid,String passwd);
     void sendClient(std::string text);
-    std::string urlEncode(std::string input);
+    String urlEncode(String input);
     void sendCmd(std::string text);
 }
 

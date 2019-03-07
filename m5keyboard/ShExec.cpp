@@ -227,10 +227,9 @@ void Exec::run(void*){
     while(i<length){
         execLine(lines[i]);
         i++;
+        if(this->isloop&&i>=length){
+            i=0;
+        }
     }
-    if(this->isloop){
-        this->start();
-    }else{
-        Display::result("run script ok");
-    }
+    Display::result("run script ok");
 }

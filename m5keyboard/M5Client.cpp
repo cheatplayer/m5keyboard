@@ -56,41 +56,42 @@ void RequestTask::run(void*){
     }
 }
 
-std::string TheClient::urlEncode(std::string input) {//replace
-  if(input== " ")return "+";
-  else if(input== " ")return "%20";
-  else if(input== "!")return "%21";
-  else if(input== "\"")return "%22";
-  else if(input== "#")return "%23";
-  else if(input== "%")return "%25";
-  else if(input== "&")return "%26";
-  else if(input== "\'")return "%27";
-  else if(input== "(")return "%28";
-  else if(input== ")")return "%29";
-  else if(input== "+")return "%2B";
-  else if(input== ".")return "%2E";
-  else if(input== "/")return "%2F";
-  else if(input== ",")return "%2C";
-  else if(input== ":")return "%3A";
-  else if(input== ",")return "%3B";
-  else if(input== "<")return "%3C";
-  else if(input== "=")return "%3D";
-  else if(input== ">")return "%3E";
-  else if(input== "?")return "%3F";
-  else if(input== "@")return "%40";
-  else if(input== "[")return "%5B";
-  else if(input== "\\")return "%5C";
-  else if(input== "]")return "%5D";
-  else if(input== "^")return "%5E";
-  else if(input== "_")return "%5F";
-  else if(input== "`")return "%60";
-  else if(input== "{")return "%7B";
-  else if(input== "|")return "%7C";
-  else if(input== "}")return "%7D";
-  else if(input== "\r")return "%0D";
-  else if(input== "\n")return "%0A";
+String TheClient::urlEncode(String input) {
+  String s=input;
+  s.replace(" ","+");
+  s.replace(" ","%20");
+  s.replace("!","%21");
+  s.replace("\"","%22");
+  s.replace("#","%23");
+  s.replace("%","%25");
+  s.replace("&","%26");
+  s.replace("\'","%27");
+  s.replace("(","%28");
+  s.replace(")","%29");
+  s.replace("+","%2B");
+  s.replace(".","%2E");
+  s.replace("/","%2F");
+  s.replace(",","%2C");
+  s.replace(":","%3A");
+  s.replace(",","%3B");
+  s.replace("<","%3C");
+  s.replace("=","%3D");
+  s.replace(">","%3E");
+  s.replace("?","%3F");
+  s.replace("@","%40");
+  s.replace("[","%5B");
+  s.replace("\\","%5C");
+  s.replace("]","%5D");
+  s.replace("^","%5E");
+  s.replace("_","%5F");
+  s.replace("`","%60");
+  s.replace("{","%7B");
+  s.replace("|","%7C");
+  s.replace("}","%7D");
+  s.replace("\r","%0D");
+  s.replace("\n","%0A");
   // s.replace("%09", "\t");
-  return input;
+  return s;
 }
 
 void clientcallback(int code,String payload){
@@ -101,8 +102,9 @@ void clientcallback(int code,String payload){
 
 void TheClient::sendClient(std::string text){
     if(isClientConnected){
-        Serial.println(text);
-        std::string query="q="+TheClient::urlEncode(text)+"&";
+        Serial.println(text.c_str());
+        String t=String()+text.c_str();
+        String query="q="+TheClient::urlEncode(t)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/input",query,clientcallback);
         reqtask->start();
@@ -111,8 +113,9 @@ void TheClient::sendClient(std::string text){
 
 void TheClient::sendCmd(std::string text){
     if(isClientConnected){
-        Serial.println(text);
-        std::string query="q="+TheClient::urlEncode(text)+"&";
+        Serial.println(text.c_str());
+        String cmd=String()+text.c_str();
+        String query="q="+TheClient::urlEncode(cmd)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/cmd",query,clientcallback);
         reqtask->start();

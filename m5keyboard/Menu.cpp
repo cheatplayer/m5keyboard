@@ -57,13 +57,15 @@ void Menu::save(){
         savemsg=record_str;
         Display::info("input file name");
         savename="/";
+        isclientcmd=true;
     }else{
-        savename+=record_str;
+        savename+=clientcmd;
         if(SDCard::write(savename.c_str(),savemsg.c_str())){
             Display::result("save ok");
         }else{
             Display::result("save fail");
         }
+        isclientcmd=false;
         savename="";
         savemsg="";
     }
@@ -164,11 +166,14 @@ void Menu::loop(){
 }
 
 void Menu::loopStop(){
-    runscripttask->isloop=false;
-    runscripttask->stop();
-    delete runscripttask;
+    if(isConnected){
+        runscripttask->isloop=false;
+        runscripttask->stop();
+        delete runscripttask;
+    }else if(isClientConnected){
+        TheClient::sendCmd("LEND ");
+    }
     Display::result("loop script stoped");
-    TheClient::sendCmd("LEND ");
 }
 
 void Menu::startSTAMenu(){
