@@ -70,7 +70,7 @@ void execLine(String line){
 }
 
 void execLine(std::string line){
-    delay(defaultDelay);
+    //delay(defaultDelay);
     if(line.substr(0,3)==">>>"){
         std::vector<std::string> sp=split(line.substr(4),' ');
         int i=0;
@@ -91,6 +91,11 @@ void execLine(std::string line){
         delay(defaultDelay);
         Keyboard.release(key);
         delay(defaultDelay);
+   }else if(line.length()==1){
+        Serial.println("1111");
+        char key=line[0];
+        Keyboard.press(key);
+        Keyboard.releaseAll();
    }else{
         Keyboard.write(line.c_str(),line.size());
         delay(defaultDelay);

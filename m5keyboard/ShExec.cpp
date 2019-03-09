@@ -110,7 +110,7 @@ std::string Sh::stringify(char key_val){
 
     if(i==13)return "\r::: ENTER\r";
     if(i==127)return "\r::: DEL\r";
-    if(i>=154&&i<=161)return "\r::: "+Fmap[i-156]+"\r";
+    if(i>=154&&i<=161)return "\r::: "+Fmap[i-154]+"\r";
     if(i>=164&&i<=167)return "\r::: "+Fmap[i-156]+"\r";
     if(i==163)return "\n\r";   
     if(i==172)return "\r$$$ 1000\r";

@@ -58,11 +58,12 @@ void RequestTask::run(void*){
 
 String TheClient::urlEncode(String input) {
   String s=input;
+  int i=input[0];
   s.replace(" ","+");
   s.replace(" ","%20");
-  s.replace("!","%21");
-  s.replace("\"","%22");
-  s.replace("#","%23");
+  // s.replace("!","%21");
+  // s.replace("\"","%22");
+  // s.replace("#","%23");
   s.replace("%","%25");
   s.replace("&","%26");
   s.replace("\'","%27");
@@ -90,7 +91,13 @@ String TheClient::urlEncode(String input) {
   s.replace("}","%7D");
   s.replace("\r","%0D");
   s.replace("\n","%0A");
-  // s.replace("%09", "\t");
+  // s.replace("\t",":::+TAB%0D");
+  if(input==" "){
+    s=":::+SPACE";
+  }
+  if(i==186){
+    s=":::+TAB";
+  }
   return s;
 }
 

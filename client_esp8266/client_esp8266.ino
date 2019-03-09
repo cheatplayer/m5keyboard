@@ -253,19 +253,19 @@ void setup() {
 
   server.on("/cmd",HTTP_POST,[](AsyncWebServerRequest *request){
     String q=request->arg("q");
-    Serial.println("^B$ "+q);
+    Serial.print("^B$ "+q);
     request->send(200, "text/plain", q);
   });
 
   server.on("/input",HTTP_POST,[](AsyncWebServerRequest *request){
     String q=request->arg("q");
-    Serial.println(q);
+    Serial.print(q);
     request->send(200, "text/plain", q);
   });
 
   server.on("/input",HTTP_GET,[](AsyncWebServerRequest *request){
     String q=request->arg("q");
-    Serial.println(q);
+    Serial.print(q);
     request->send(200, "text/plain", q);
   });
 

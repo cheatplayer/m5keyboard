@@ -36,23 +36,23 @@ MenuFunc menufuncA[MENULEN]={
     {"run",Menu::runScript},
     {"halt",Menu::halt},
     {"loop",Menu::loop},
+    {"Client",Menu::startClientMenu},
     {"cmd",Menu::clientCmd},
     {"rm",Menu::rm},
-    {"stopBLE",StopBLEServer},
     {"STA",Menu::startSTAMenu},
     {"AP",Menu::startAPMenu}
 };
 
 MenuFunc menufuncB[MENULEN]={
-    {"Client",Menu::startClientMenu},
+    {"stop",StopBLEServer},
     {"clear",Menu::clear},
     {"find",Menu::find},
     {"cancel",Menu::runScriptStop},
     {"ls",Menu::ls},
     {"stop",Menu::loopStop},
+    {"stop",Menu::stopClientMenu},
     {"send",Menu::sendClientCmd},
     {"find",Menu::find},
-    {"stopClient",Menu::stopClientMenu},
     {"stop",M5Server::stopSTA},
     {"stop",M5Server::stopAP}
 };

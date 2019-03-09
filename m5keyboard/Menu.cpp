@@ -36,6 +36,7 @@ void Menu::record(char key_val){
 }
 
 void Menu::clientCmd(){
+    clientcmd="";
     isclientcmd=true;
 }
 
