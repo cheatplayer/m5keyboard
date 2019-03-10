@@ -59,17 +59,13 @@ void RequestTask::run(void*){
 String TheClient::urlEncode(String input) {
   String s=input;
   int i=input[0];
+  s.replace("+","%2B");
   s.replace(" ","+");
-  s.replace(" ","%20");
-  // s.replace("!","%21");
-  // s.replace("\"","%22");
-  // s.replace("#","%23");
   s.replace("%","%25");
   s.replace("&","%26");
   s.replace("\'","%27");
   s.replace("(","%28");
   s.replace(")","%29");
-  s.replace("+","%2B");
   s.replace(".","%2E");
   s.replace("/","%2F");
   s.replace(",","%2C");

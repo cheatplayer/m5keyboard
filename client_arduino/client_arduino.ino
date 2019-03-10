@@ -60,6 +60,7 @@ int parse(std::string n){
     if(n=="DOWN")return 0xD9;
     if(n=="RIGHT")return 0xD7;
     if(n=="SPACE")return (int)' ';
+    if(n=="TAB")return 0x09;
     return (int)n[0];
 }
 
