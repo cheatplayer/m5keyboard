@@ -121,7 +121,7 @@ void setup() {
     request->send(200, "text/plain", filename);
   });
 
-  server.on("/recordend",HTTP_GET,[](AsyncWebServerRequest *request){
+  server.on("/recordend",HTTP_POST,[](AsyncWebServerRequest *request){
     Serial.println("^B$ REND ");
     request->send(200, "text/plain", "recordend");
   });
@@ -161,7 +161,7 @@ void setup() {
       request->send(response);
   });
 
-  server.on("/restart", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
       request->send(200, "text/plain", "true");
 	  shouldReboot = true;
   });
@@ -219,10 +219,7 @@ void loop() {
 		if( tag== "^B$") {
             String cmd=originStr.substring(4,8);
             String query=originStr.substring(9);
-            if(cmd=="REST"){
-                settings.reset();
-                shouldReboot = true;
-            }else if(cmd=="READ"){
+            if(cmd=="READ"){
                 readtext=query;
             }else if(cmd=="LSLS"){
                 lstext=query;
