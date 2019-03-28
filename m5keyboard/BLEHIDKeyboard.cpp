@@ -6,12 +6,14 @@
 #include "Display.h"
 
 bool isConnected = false;
+bool isUseMouse=true;
 
 BLEHIDDevice *hid;
 BLECharacteristic *input;
+BLECharacteristic* inputMouse;
 BLECharacteristic *output;
 BLEServer *bleserver;
-BLESecurity *security;
+// BLESecurity *security;
 ServerCallbacks *servercallback;
 OutputCallbacks *outputcallback;
 BLEAdvertising *advertising;
@@ -35,6 +37,9 @@ void ServerCallbacks::onConnect(BLEServer* bleserver){
 }
 
 void ServerCallbacks::onDisconnect(BLEServer* bleserver){
+    BLE2902* desc;
+    desc = (BLE2902*) input->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
+    desc->setNotifications(false);
     isConnected = false;
     displayBLEServerStatus();
 }
@@ -73,7 +78,7 @@ void simulateKey(KEYMAP map){
 void StartBLEServer()
 {
 
-    BLEDevice::init("M5 BlueTooth Keyboard");
+    BLEDevice::init("M5 BlueTooth HID");
     bleserver = BLEDevice::createServer();
     servercallback=new ServerCallbacks();
     bleserver->setCallbacks(servercallback);
@@ -82,32 +87,52 @@ void StartBLEServer()
      * https://www.bluetooth.com/specifications/gatt/viewer
      */   
     hid = new BLEHIDDevice(bleserver);
-
-    input = hid->inputReport(1); // <-- input REPORTID from report map
-    output = hid->outputReport(1); // <-- output REPORTID from report map
-
-    outputcallback=new OutputCallbacks();
-    output->setCallbacks(outputcallback);
     std::string name = "cheatplayer";
     hid->manufacturer()->setValue(name);
     hid->pnp(0x02, 0xe502, 0xa111, 0x0210);
     hid->hidInfo(0x00,0x01);
-    hid->reportMap((uint8_t*)reportMap, sizeof(reportMap));
-    hid->setBatteryLevel(0x01);
 
+    // hid->reportMap((uint8_t*)reportMapOld, sizeof(reportMapOld));//old
+    // hid->setBatteryLevel(0x01);
 
+    size_t reportMapSize = sizeof(reportMapKeyboard);
+    if(isUseMouse)reportMapSize+=sizeof(reportMapMouse);
+    uint8_t *reportMap = (uint8_t *)malloc(reportMapSize);
+    uint8_t *reportMapCurrent = reportMap;
+    uint8_t reportID = 1;
+    //keyboard
+    memcpy(reportMapCurrent,reportMapKeyboard,sizeof(reportMapKeyboard));
+    reportMap[7] = reportID;
+    reportMapCurrent += sizeof(reportMapKeyboard);
+    input = hid->inputReport(reportID); // <-- input REPORTID from report map
+    output = hid->outputReport(reportID); // <-- output REPORTID from report map
+    outputcallback=new OutputCallbacks();
+    output->setCallbacks(outputcallback);
+    //mouse
+    if(isUseMouse){
+        reportID++;
+        memcpy(reportMapCurrent,reportMapMouse,sizeof(reportMapMouse));
+        reportMapCurrent[7] = reportID;
+        reportMapCurrent += sizeof(reportMapMouse);
+        
+        //create in characteristics/reports for mouse
+        inputMouse = hid->inputReport(reportID);
+    }
+
+    hid->reportMap((uint8_t*)reportMap, reportMapSize);
     hid->startServices();
 
     /*
      * Its good to setup advertising by providing appearance and advertised service. This will let clients find our device by type
      */
     advertising = bleserver->getAdvertising();
-    advertising->setAppearance(HID_KEYBOARD);
+    // advertising->setAppearance(HID_KEYBOARD);//old
+    advertising->setAppearance(GENERIC_HID);
     advertising->addServiceUUID(hid->hidService()->getUUID());
     advertising->start();
 
-    security = new BLESecurity();
-    security->setAuthenticationMode(ESP_LE_AUTH_BOND);//a
+    // security = new BLESecurity();
+    // security->setAuthenticationMode(ESP_LE_AUTH_BOND);//a
 
     Serial.println("server advertising");
     displayBLEServerStatus();
@@ -126,7 +151,7 @@ void StopBLEServer(){
         delete input;
         delete output;
         delete bleserver;
-        delete security;
+        // delete security;
         delete servercallback;
         delete outputcallback;
     }
@@ -154,3 +179,4 @@ void inputKeyValue(int key_val){
         simulateKey(usagekey);
     }
 }
+

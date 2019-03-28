@@ -4,6 +4,7 @@
 
 #include <M5Stack.h>
 #include "BLEHIDKeyboard.h"
+#include "BLEHIDMouse.h"
 #include "SDCard.h"
 #include "Menu.h"
 #include "Display.h"
@@ -20,6 +21,7 @@ extern void StopBLEServer();
 
 extern bool isAPStarted;
 extern bool isSTAConnected;
+extern bool isMouseOn;
 extern WebServer webServer;
 extern Preferences preferences;
 
@@ -28,13 +30,14 @@ typedef struct {
     void (*func)();
 } MenuFunc;
 
-const int MENULEN= 11;
+const int MENULEN= 12;
 MenuFunc menufuncA[MENULEN]={
     {"BLE",StartBLEServer},
-    {"save",Menu::save},
     {"load",Menu::load},
     {"run",Menu::runScript},
+    {"save",Menu::save},
     {"halt",Menu::halt},
+    {"click",Mouse::clickLeft},
     {"loop",Menu::loop},
     {"Client",Menu::startClientMenu},
     {"cmd",Menu::clientCmd},
@@ -45,10 +48,11 @@ MenuFunc menufuncA[MENULEN]={
 
 MenuFunc menufuncB[MENULEN]={
     {"stop",StopBLEServer},
-    {"clear",Menu::clear},
     {"find",Menu::find},
-    {"cancel",Menu::runScriptStop},
+    {"cancel",Menu::runScriptStop},    
+    {"clear",Menu::clear},
     {"ls",Menu::ls},
+    {"mouse",Mouse::test},
     {"stop",Menu::loopStop},
     {"stop",Menu::stopClientMenu},
     {"send",Menu::sendClientCmd},
@@ -92,6 +96,11 @@ void loop() {
     Display::menu(menufuncA[menuindex].name);
     Display::info(menufuncB[menuindex].name);
     Display::result("menu");
+    if(menuindex==5){//mouse
+        isMouseOn=true;
+    }else{
+        isMouseOn=false;
+    }
   }
 
   if(digitalRead(KEYBOARD_INT) == LOW) {

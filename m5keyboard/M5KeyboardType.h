@@ -12,6 +12,8 @@
 #define KEY_MOD_RSHIFT 0x20
 #define KEY_MOD_RALT   0x40
 #define KEY_MOD_RMETA  0x80
+#define INPUT(size)             (0x80 | size)
+#define OUTPUT(size)            (0x90 | size)
 
 enum MODIFIER_KEY {
     KEY_CTRL = 1,
@@ -223,7 +225,7 @@ const KEYMAP m5keymap[194]={
     {0x4f, 0},/*right */
 };
 
-const uint8_t reportMap[] = {
+const uint8_t reportMapOld[] = {
   USAGE_PAGE(1),      0x01,       // Generic Desktop Ctrls
   USAGE(1),           0x06,       // Keyboard
   COLLECTION(1),      0x01,       // Application
@@ -259,3 +261,85 @@ const uint8_t reportMap[] = {
   END_COLLECTION(0)
 };
 #endif
+
+/** @brief Constant report map for keyboard
+ * 
+ * This report map will be used on init do build a report map according
+ * to init functions (with activated interfaces).
+ * 
+ * @note Report id is on all reports in offset 7.
+ * */
+const uint8_t reportMapKeyboard[] = {
+  USAGE_PAGE(1),      0x01,       // Generic Desktop Ctrls
+  USAGE(1),           0x06,       // Keyboard
+  COLLECTION(1),      0x01,       // Application
+    REPORT_ID(1),       0x01,
+    //report equal to usb_bridge (https://github.com/benjaminaigner/usb_bridge
+    REPORT_SIZE(1),     0x01,
+    REPORT_COUNT(1),    0x08,
+    USAGE_PAGE(1),      0x07,       //   Kbrd/Keypad
+    USAGE_MINIMUM(1),   0xE0,
+    USAGE_MAXIMUM(1),   0xE7,
+    LOGICAL_MINIMUM(1), 0x00,
+    LOGICAL_MAXIMUM(1), 0x01,
+    INPUT(1),           0x02,       //   Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position
+    REPORT_COUNT(1),    0x01,
+    REPORT_SIZE(1),     0x08,
+    INPUT(1),           0x03,
+    REPORT_COUNT(1),    0x05,
+    REPORT_SIZE(1),     0x01,
+    USAGE_PAGE(1),      0x08,       //   LEDs
+    USAGE_MINIMUM(1),   0x01,       //   Num Lock
+    USAGE_MAXIMUM(1),   0x05,       //   Kana
+    OUTPUT(1),          0x02,       //   Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile
+    REPORT_COUNT(1),    0x01,       //   3 bits (Padding)
+    REPORT_SIZE(1),     0x03,
+    OUTPUT(1),          0x03,
+    REPORT_COUNT(1),    0x06,       //   6 bytes (Keys)
+    REPORT_SIZE(1),     0x08,
+    LOGICAL_MINIMUM(1), 0x00,
+    LOGICAL_MAXIMUM(1), 104,       //   104 keys
+    USAGE_PAGE(1),      0x07,       //   Kbrd/Keypad
+    USAGE_MINIMUM(1),   0x00,       //   Num Lock
+    USAGE_MAXIMUM(1),   104,       //   Kana
+    INPUT(1),           0x00,
+  END_COLLECTION(0)
+};
+
+/** @brief Constant report map for mouse
+ * 
+ * This report map will be used on init do build a report map according
+ * to init functions (with activated interfaces).
+ * 
+ * @note Report id is on all reports in offset 7.
+ * */
+const uint8_t reportMapMouse[] = {
+  USAGE_PAGE(1),            0x01,
+  USAGE(1),                   0x02,
+  COLLECTION(1),            0x01,
+    REPORT_ID(1),       0x02,
+    USAGE(1),                   0x01,
+    COLLECTION(1),          0x00,
+      USAGE_PAGE(1),            0x09,
+      USAGE_MINIMUM(1),     0x1,
+      USAGE_MAXIMUM(1),     0x3,
+      LOGICAL_MINIMUM(1),   0x0,
+      LOGICAL_MAXIMUM(1),   0x1,
+      REPORT_COUNT(1),      0x3,
+      REPORT_SIZE(1),       0x1,
+      INPUT(1),                   0x2,      // (Data, Variable, Absolute), ;8 button bits
+      REPORT_COUNT(1),      0x1,
+      REPORT_SIZE(1),         0x5,
+      INPUT(1),                   0x1,      //(Constant), ;5 bit padding
+      USAGE_PAGE(1),          0x1,      //(Generic Desktop),
+      USAGE(1),                 0x30,   //X
+      USAGE(1),                 0x31,   //Y
+      USAGE(1),                 0x38,   //wheel
+      LOGICAL_MINIMUM(1),   0x81,
+      LOGICAL_MAXIMUM(1),   0x7f,
+      REPORT_SIZE(1),       0x8,
+      REPORT_COUNT(1),      0x03,   //3 bytes: X/Y/wheel
+      INPUT(1),                   0x6,      //(Data, Variable, Relative), ;3 position bytes (X & Y & wheel)
+    END_COLLECTION(0),
+  END_COLLECTION(0)
+};
