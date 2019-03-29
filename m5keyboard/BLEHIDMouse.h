@@ -5,8 +5,8 @@
 namespace Mouse{
     void clickLeft();
     void clickRight();
-    void wheel(uint8_t wheel);
-    void move(uint8_t x,uint8_t y);
+    void wheel(int wheel);
+    void move(int x,int y);
     void test();
 }
 

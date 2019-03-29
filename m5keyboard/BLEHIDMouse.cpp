@@ -18,21 +18,21 @@ void doMouse(uint8_t button,uint8_t x,uint8_t y,uint8_t wheel){
 }
 
 void Mouse::clickLeft(){
-    doMouse(0x01,0,0,0);
+    doMouse((uint8_t)1,(uint8_t)0,(uint8_t)0,(uint8_t)0);
 }
 
 void Mouse::clickRight(){
-    doMouse(0x02,0,0,0);
+    doMouse((uint8_t)2,(uint8_t)0,(uint8_t)0,(uint8_t)0);
 }
 
-void Mouse::wheel(uint8_t wheel){
-    doMouse(0,0,0,wheel);
+void Mouse::wheel(int wheel){
+    doMouse((uint8_t)0,(uint8_t)0,(uint8_t)0,(uint8_t)wheel);
 }
 
-void Mouse::move(uint8_t x,uint8_t y){
-    doMouse(0,x,y,0);
+void Mouse::move(int x,int y){
+    doMouse((uint8_t)0,(uint8_t)x,(uint8_t)y,(uint8_t)0);
 }
 
 void Mouse::test(){
-    doMouse(0,20,20,0);
+    doMouse((uint8_t)0,(uint8_t)20,(uint8_t)20,(uint8_t)0);
 }

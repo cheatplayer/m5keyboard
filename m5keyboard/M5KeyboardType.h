@@ -260,7 +260,6 @@ const uint8_t reportMapOld[] = {
   HIDINPUT(1),           0x00,       //   Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
   END_COLLECTION(0)
 };
-#endif
 
 /** @brief Constant report map for keyboard
  * 
@@ -343,3 +342,5 @@ const uint8_t reportMapMouse[] = {
     END_COLLECTION(0),
   END_COLLECTION(0)
 };
+
+#endif
