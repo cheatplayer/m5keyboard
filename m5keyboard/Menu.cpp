@@ -78,6 +78,9 @@ std::string findname="";
 std::vector<std::string> findfiles;
 int findindex=0;
 void Menu::find(){
+    if(findindex==0){
+        Menu::ls();
+    }
     if(findfiles.size()==0){
         return;
     }
@@ -151,6 +154,20 @@ void Menu::runScriptStop(){
     Display::result("run script stoped");
 }
 
+bool isRuning=false;
+void Menu::runMenu(){
+    if(isRuning){
+        Menu::runScriptStop();
+        isRuning=false;
+        Display::menu("run");
+    }else{
+        Menu::runScript();
+        isRuning=true;
+        Display::menu("cancel");
+    }
+
+}
+
 void Menu::loop(){
   if(isConnected){
     runscripttask= new Exec(record_str);
@@ -177,6 +194,19 @@ void Menu::loopStop(){
     Display::result("loop script stoped");
 }
 
+bool isLooping=false;
+void Menu::loopMenu(){
+    if(isLooping){
+        Menu::loopStop();
+        isLooping=false;
+        Display::info("loop");
+    }else{
+        Menu::loop();
+        isLooping=true;
+        Display::info("cancel");
+    }
+}
+
 void Menu::startSTAMenu(){
     M5Server::startSTA();
     CheckServerTask *checkservertask= new CheckServerTask();
@@ -198,4 +228,12 @@ extern bool isClientConnected;
 void Menu::stopClientMenu(){
     M5.Lcd.fillCircle(10,230,3,RED);
     isClientConnected=false;
+}
+
+extern void StopBLEServer();
+void Menu::stopAll(){
+    M5Server::stopAP();
+    M5Server::stopSTA();
+    Menu::stopClientMenu();
+    StopBLEServer();
 }

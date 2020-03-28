@@ -9,9 +9,8 @@ bool isMounted=false;
 void SDCard::displaySDStatus()
 {
   if(isMounted){
-    M5.Lcd.fillCircle(20,230,3,GREEN);
   }else{
-    M5.Lcd.fillCircle(20,230,3,RED);
+    M5.Lcd.print("SD Card Mount Failed");
   }
 }
 

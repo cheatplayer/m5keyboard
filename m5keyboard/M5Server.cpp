@@ -19,8 +19,8 @@ bool isSTAConnected=false;
 bool isSTAStarted=false;
 bool isAPStarted=false;
 
-const IPAddress apIP(192, 168, 13, 1);
-const char* apSSID = "TP-LINK_M5KB";
+const IPAddress apIP(192, 168, 1, 1);
+const char* apSSID = "M5Keyboard";
 const char* appassword = "cheatplayer";
 String wifi_ssid;
 String wifi_password;
@@ -39,18 +39,18 @@ void M5Server::displayServerStatus(){
         M5.Lcd.fillCircle(10,230,3,GREEN);
     }
   if(isSTAConnected){
-    M5.Lcd.fillCircle(30,230,3,GREEN);
+    M5.Lcd.fillCircle(20,230,3,GREEN);
     return;
   }
   if(isAPStarted){
-    M5.Lcd.fillCircle(30,230,3,BLUE);
+    M5.Lcd.fillCircle(20,230,3,BLUE);
     return;
   }
   if(isSTAStarted){
-    M5.Lcd.fillCircle(30,230,3,YELLOW);
+    M5.Lcd.fillCircle(20,230,3,YELLOW);
     return;
   }
-  M5.Lcd.fillCircle(30,230,3,RED);
+  M5.Lcd.fillCircle(20,230,3,RED);
 }
 
 void M5Server::startServer(){
@@ -65,6 +65,7 @@ void M5Server::startServer(){
       s+="<li>run ? filename | text</li>";
       s+="<li>setsta ? ssid & pass</li>";
       s+="</ul>";
+      s+="<a href='https://github.com/cheatplayer/m5keyboard'>&copy; M5Keyboard</a>";
       webServer.send(200, "text/html", M5Server::makePage("STA mode", s));
     });
 
@@ -209,15 +210,18 @@ void M5Server::startAP(){
     WiFi.softAP(apSSID,appassword);
     WiFi.mode(WIFI_MODE_AP);
     isAPStarted=true;
-    Display::result("192.168.13.1");
+    Display::result("192.168.1.1");
     M5Server::displayServerStatus();
 }
 
 void M5Server::stopAP(){
-    WiFi.mode(WIFI_MODE_AP);
-    WiFi.softAPdisconnect();
-    isAPStarted=false;
-    M5Server::displayServerStatus();
+    if(isAPStarted){
+        WiFi.mode(WIFI_MODE_AP);
+        WiFi.softAPdisconnect();
+        isAPStarted=false;
+        M5Server::displayServerStatus();
+    }
+    
 }
 
 void M5Server::startSTA(){
@@ -234,11 +238,13 @@ void M5Server::startSTA(){
 }
 
 void M5Server::stopSTA(){
-    WiFi.mode(WIFI_MODE_STA);
-    WiFi.disconnect();
-    isSTAStarted=false;
-    isSTAConnected=false;
-    M5Server::displayServerStatus();
+    if(isSTAStarted){
+        WiFi.mode(WIFI_MODE_STA);
+        WiFi.disconnect();
+        isSTAStarted=false;
+        isSTAConnected=false;
+        M5Server::displayServerStatus();
+    }
 }
 
 void M5Server::scanNetworks(){

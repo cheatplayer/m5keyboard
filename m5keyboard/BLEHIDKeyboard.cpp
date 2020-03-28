@@ -32,6 +32,7 @@ void ServerCallbacks::onConnect(BLEServer* bleserver){
      desc->setNotifications(true);
      isConnected = true;
      displayBLEServerStatus();
+     advertising->stop();//dev
 }
 
 void ServerCallbacks::onDisconnect(BLEServer* bleserver){

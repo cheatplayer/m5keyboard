@@ -16,7 +16,6 @@
 #define KEYBOARD_INT          5
 
 extern void StartBLEServer();
-extern void StopBLEServer();
 
 extern bool isAPStarted;
 extern bool isSTAConnected;
@@ -28,33 +27,23 @@ typedef struct {
     void (*func)();
 } MenuFunc;
 
-const int MENULEN= 11;
+const int MENULEN= 6;
 MenuFunc menufuncA[MENULEN]={
     {"BLE",StartBLEServer},
     {"save",Menu::save},
     {"load",Menu::load},
-    {"run",Menu::runScript},
+    {"run",Menu::runMenu},
     {"halt",Menu::halt},
-    {"loop",Menu::loop},
-    {"Client",Menu::startClientMenu},
-    {"cmd",Menu::clientCmd},
-    {"rm",Menu::rm},
     {"STA",Menu::startSTAMenu},
-    {"AP",Menu::startAPMenu}
 };
 
 MenuFunc menufuncB[MENULEN]={
-    {"stop",StopBLEServer},
+    {"Client",Menu::startClientMenu},
     {"clear",Menu::clear},
     {"find",Menu::find},
-    {"cancel",Menu::runScriptStop},
-    {"ls",Menu::ls},
-    {"stop",Menu::loopStop},
-    {"stop",Menu::stopClientMenu},
-    {"send",Menu::sendClientCmd},
-    {"find",Menu::find},
-    {"stop",M5Server::stopSTA},
-    {"stop",M5Server::stopAP}
+    {"loop",Menu::loopMenu},
+    {"stop",Menu::stopAll},
+    {"AP",Menu::startAPMenu},
 };
 
 int menuindex= 0;
