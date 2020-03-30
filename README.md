@@ -72,6 +72,55 @@
        +------+----+-------------------+----+------+
 ```
 
+### HID Script
+
+line split by `\r`
+
+#### basic
+
+`character`
+    
+#### mult and special key
+
+`>>> KEYCODE OPTIONAL_KEYCODE...`
+
+`::: KEYCODE`
+
+**keycode**
+
+`CTRL` `LCTRL` `RCTRL`
+
+`SHIFT` `LSHIFT` `RSHIFT`
+
+`ALT` `LALT` `RALT`
+
+`CMD` `META` `GUI` `LMETA` `RMETA`
+
+`ENTER` `DEL` `ESC` `CAPS` `SPACE`
+
+`UP` `LEFT` `DOWN` `RIGHT`
+
+`F1` ~ `F12`
+
+**example**
+
+```
+>>> CTRL SPACE
+>>> SHIFT ALT f
+```
+```
+::: ESC
+```
+
+#### delay
+
+`$$$ time`
+
+**example**
+
+`$$$ 1000`
+
+
 ### Refenerce
 
 - https://github.com/nkolban/esp32-snippets
