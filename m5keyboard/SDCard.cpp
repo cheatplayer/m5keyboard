@@ -46,8 +46,8 @@ void SDCard::mount(){
     SDCard::displaySDStatus();
 }
 
-std::vector<std::string> SDCard::ls(const char *path){
-    std::vector<std::string> v;
+std::vector<String> SDCard::ls(const char *path){
+    std::vector<String> v;
     if(!isMounted){
         return v;
     }
@@ -57,7 +57,7 @@ std::vector<std::string> SDCard::ls(const char *path){
     }
     File file=root.openNextFile();
     while(file){
-        std::string filename=file.name();
+        String filename=file.name();
         if(file.isDirectory()){
             // v.push_back(filename+"/");
         }else{
@@ -85,13 +85,13 @@ bool SDCard::rmdir(const char *path){
     }
 }
 
-std::string SDCard::read(const char *path){
+String SDCard::read(const char *path){
     if(isMounted){
         File file=SD.open(path);
         if(!file){
             return "";
         }
-        std::string result;
+        String result;
       while(file.available()){
           result+=file.read();
       }

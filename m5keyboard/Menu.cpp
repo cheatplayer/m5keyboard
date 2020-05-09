@@ -3,7 +3,6 @@
 */
 #include <M5Stack.h>
 #include "Menu.h"
-#include <string>
 #include "Display.h"
 #include "SDCard.h"
 #include "BLEHIDKeyboard.h"
@@ -14,21 +13,21 @@
 extern bool isConnected;
 extern void inputKeyValue(int key_val);
 extern bool isClientConnected;
-std::string clientcmd="";
+String clientcmd="";
 bool isclientcmd=false;
 
 void Menu::halt(){
     M5.powerOFF();
 }
 
-std::string record_str="";
+String record_str="";
 void Menu::record(char key_val){
     if(isclientcmd){
         clientcmd+=key_val;
     }else{
         int i=(int)key_val;
         inputKeyValue(i);
-        std::string sh=Sh::stringify(key_val);
+        String sh=Sh::stringify(key_val);
         record_str+=sh;
         TheClient::sendClient(sh);
     }
@@ -51,8 +50,8 @@ void Menu::clear(){
     record_str="";
 }
 
-std::string savename="";
-std::string savemsg="";
+String savename="";
+String savemsg="";
 void Menu::save(){
     if(savename==""){
         savemsg=record_str;
@@ -74,8 +73,8 @@ void Menu::save(){
     Menu::rels();  
 }
 
-std::string findname="";
-std::vector<std::string> findfiles;
+String findname="";
+std::vector<String> findfiles;
 int findindex=0;
 void Menu::find(){
     if(findindex==0){

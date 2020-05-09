@@ -18,7 +18,7 @@ namespace M5Server{
     void startSTA();
     void stopSTA();
     void scanNetworks();
-    String optionSD(std::vector<std::string> findfiles);
+    String optionSD(std::vector<String> findfiles);
 };
 
 class CheckServerTask:public Task{

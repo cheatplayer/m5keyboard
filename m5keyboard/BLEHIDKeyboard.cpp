@@ -89,7 +89,7 @@ void StartBLEServer()
 
     outputcallback=new OutputCallbacks();
     output->setCallbacks(outputcallback);
-    std::string name = "cheatplayer";
+    String name = "cheatplayer";
     hid->manufacturer()->setValue(name);
     hid->pnp(0x02, 0xe502, 0xa111, 0x0210);
     hid->hidInfo(0x00,0x01);

@@ -7,27 +7,26 @@
 #ifndef SHEXEC_H
 #define SHEXEC_H
 
-#include <string>
 #include "Task.h"
 #include <vector>
 
 namespace Sh{
-    std::string stringify(char key_val);
-    std::vector<std::string> split(std::string str,char sep);
-    int parse(std::string keyname);
+    String stringify(char key_val);
+    std::vector<String> split(String str,char sep);
+    int parse(String keyname);
 }
 
 class Exec:public Task
 {
 public:
-    std::vector<std::string> lines;
+    std::vector<String> lines;
     int length=0;
     bool isloop=false;
-    Exec(std::string text);
+    Exec(String text);
     Exec();
-    void setSplit(std::string text);
+    void setSplit(String text);
     void run(void*);
-    void execLine(std::string line);
+    void execLine(String line);
     void execBLEString(const char *text); 
 };
 

@@ -23,12 +23,6 @@ void RequestTask::setRequest(String urlstr,String querystr,void (*func)(int code
     callback=func;
 }
 
-RequestTask::RequestTask(std::string url,std::string query,void (*func)(int code,String payload)){
-    String turl=String()+url.c_str();
-    String tquery=String()+query.c_str();
-    setRequest(turl,tquery,func);
-}
-
 RequestTask::RequestTask(String url,String query,void (*func)(int code,String payload)){
     setRequest(url,query,func);
 }
@@ -103,22 +97,21 @@ void clientcallback(int code,String payload){
     Display::result(payload.c_str());
 }
 
-void TheClient::sendClient(std::string text){
+void TheClient::sendClient(String text){
     if(isClientConnected){
         // Serial.println(text.c_str());
-        String t=String()+text.c_str();
-        String query="q="+TheClient::urlEncode(t)+"&";
+
+        String query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/input",query,clientcallback);
         reqtask->start();
     }
 }
 
-void TheClient::sendCmd(std::string text){
+void TheClient::sendCmd(String text){
     if(isClientConnected){
-        // Serial.println(text.c_str());
-        String cmd=String()+text.c_str();
-        String query="q="+TheClient::urlEncode(cmd)+"&";
+        // Serial.println(text.c_str());;
+        String query="q="+TheClient::urlEncode(text)+"&";
         RequestTask *reqtask;
         reqtask=new RequestTask("http://192.168.4.1/cmd",query,clientcallback);
         reqtask->start();

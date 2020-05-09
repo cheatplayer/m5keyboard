@@ -32,7 +32,7 @@ WebServer webServer(80);
 // wifi config store
 Preferences preferences;
 extern bool isClientConnected;
-extern std::string record_str;
+extern String record_str;
 
 void M5Server::displayServerStatus(){
     if(isClientConnected){
@@ -104,7 +104,7 @@ void M5Server::startServer(){
 
     webServer.on("/sd",[](){
         String s="<h1>SD Card</h1>";
-        std::vector<std::string> findfiles;
+        std::vector<String> findfiles;
         findfiles=SDCard::ls("/");
         int i=0;
         //ls
@@ -164,7 +164,7 @@ void M5Server::startServer(){
     webServer.on("/run",[](){
         String filename = M5Server::urlDecode(webServer.arg("filename"));
         String text = M5Server::urlDecode(webServer.arg("text"));
-        std::string loadfile=SDCard::read(filename.c_str());
+        String loadfile=SDCard::read(filename.c_str());
 
         String s="<h1>Running</h1>";
         if(text!=""){
@@ -262,7 +262,7 @@ void M5Server::scanNetworks(){
     } 
 }
 
-String M5Server::optionSD(std::vector<std::string> findfiles){
+String M5Server::optionSD(std::vector<String> findfiles){
     String result="<select name='filename'>";
             int i=0;
         while(i<findfiles.size()){

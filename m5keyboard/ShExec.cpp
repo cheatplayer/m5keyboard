@@ -6,7 +6,7 @@
 #include "BLEHIDKeyboard.h"
 #include "Display.h"
 
-const std::string Fmap[12]={
+const String Fmap[12]={
     "F1",
     "F2",
     "F3",
@@ -22,8 +22,8 @@ const std::string Fmap[12]={
 };
 
 bool isrecord_press=false;
-std::string record_press="";
-std::string Sh::stringify(char key_val){
+String record_press="";
+String Sh::stringify(char key_val){
     int i=(int)key_val;
     if(isrecord_press&&i==176){
         record_press="";
@@ -32,13 +32,13 @@ std::string Sh::stringify(char key_val){
     }
     if(isrecord_press&&i==32){
         isrecord_press=false;
-        std::string result=record_press+"SPACE\r";
+        String result=record_press+"SPACE\r";
         record_press="";
         return result;
     }
     if(isrecord_press&&(i<144||i>153)){
         isrecord_press=false;
-        std::string result=record_press+std::string(1,key_val)+"\r";
+        String result=record_press+String(key_val)+"\r";
         record_press="";
         return result;
     }
@@ -121,10 +121,10 @@ std::string Sh::stringify(char key_val){
     if(i==192)return "\r::: DOWN\r";
     if(i==193)return "\r::: RIGHT\r";
 
-    return std::string(1,key_val);
+    return String(key_val);
 }
 
-int Sh::parse(std::string n){
+int Sh::parse(String n){
     if(n=="ENTER")return 13;
     if(n=="LCTRL"||n=="CTRL")return 144;
     if(n=="LSHIFT"||n=="SHIFT")return 145;
@@ -157,27 +157,27 @@ int Sh::parse(std::string n){
     return (int)n[0];
 }
 
-std::vector<std::string> Sh::split(std::string str,char sep){
-    std::vector<std::string> result;
-    std::string::size_type pos1, pos2;
-    pos2 = str.find(sep);
+std::vector<String> Sh::split(String str,char sep){
+    std::vector<String> result;
+    String::size_type pos1, pos2;
+    pos2 = str.indexOf(sep);
     pos1 = 0;
-    while (std::string::npos != pos2)
+    while (String::npos != pos2)
     {
-            result.push_back(str.substr(pos1, pos2 - pos1));
+            result.push_back(str.substring(pos1, pos2));
 
             pos1 = pos2 + 1;
             pos2 = str.find(sep, pos1);
     }
-    result.push_back(str.substr(pos1));
+    result.push_back(str.substring(pos1));
     return result;
 }
 
-Exec::Exec(std::string text){
+Exec::Exec(String text){
     setSplit(text);
 }
 
-void Exec::setSplit(std::string text){
+void Exec::setSplit(String text){
     lines=Sh::split(text,'\r');
     length=lines.size();
 }
@@ -200,10 +200,10 @@ void Exec::execBLEString(const char *text){
 
 extern unsigned char modifierkeys;
 
-void Exec::execLine(std::string line){
+void Exec::execLine(String line){
     // Serial.println(line.c_str());
-   if(line.substr(0,3)==">>>"){
-        std::vector<std::string> sp=Sh::split(line.substr(4),' ');
+   if(line.substring(0,3)==">>>"){
+        std::vector<String> sp=Sh::split(line.substring(4),' ');
         int i=0;
         modifierkeys=0;
         while(i<sp.size()){
@@ -211,11 +211,11 @@ void Exec::execLine(std::string line){
                 inputKeyValue(key);
                 i++;
             }
-   }else if(line.substr(0,3)=="$$$"){
-        int n=atoi(line.substr(4).c_str());
+   }else if(line.substring(0,3)=="$$$"){
+        int n=atoi(line.substring(4).c_str());
         vTaskDelay(n);
-   }else if(line.substr(0,3)==":::"){
-        int key=Sh::parse(line.substr(4));
+   }else if(line.substring(0,3)==":::"){
+        int key=Sh::parse(line.substring(4));
         inputKeyValue(key);
    }else{
         execBLEString(line.c_str());

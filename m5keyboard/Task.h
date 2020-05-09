@@ -9,7 +9,6 @@
 #define COMPONENTS_CPP_UTILS_TASK_H_
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <string>
 /**
  * @brief Encapsulate a runnable task.
  *
@@ -33,11 +32,11 @@
  */
 class Task {
 public:
-    Task(std::string taskName = "Task", uint16_t stackSize = 10000, uint8_t priority = 5);
+    Task(String taskName = "Task", uint16_t stackSize = 10000, uint8_t priority = 5);
     virtual ~Task();
     void setStackSize(uint16_t stackSize);
     void setPriority(uint8_t priority);
-    void setName(std::string name);
+    void setName(String name);
     void setCore(BaseType_t coreId);
     void start(void* taskData = nullptr);
     void stop();
@@ -57,7 +56,7 @@ private:
     xTaskHandle m_handle;
     void*       m_taskData;
     static void runTask(void* data);
-    std::string m_taskName;
+    String m_taskName;
     uint16_t    m_stackSize;
     uint8_t     m_priority;
     BaseType_t  m_coreId;
