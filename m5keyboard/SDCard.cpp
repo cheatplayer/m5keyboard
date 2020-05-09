@@ -91,12 +91,12 @@ String SDCard::read(const char *path){
         if(!file){
             return "";
         }
-        String result;
+        std::string result;
       while(file.available()){
           result+=file.read();
       }
       file.close();
-      return result;
+      return String()+result.c_str();
     }
 
 }

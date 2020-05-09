@@ -168,8 +168,8 @@ void M5Server::startServer(){
 
         String s="<h1>Running</h1>";
         if(text!=""){
-            const char *temp = const_cast<char*>(text.c_str());          
-            record_str=temp;
+            // const char *temp = const_cast<char*>(text.c_str());          
+            record_str=text;
             Menu::runScript();
             s+="<pre>"+text+"</pre>";
             s+="<p><a href='/'>home</a></p>";
@@ -350,7 +350,7 @@ String M5Server::urlDecode(String input) {
   s.replace("%7C", "|");
   s.replace("%7D", "}");
   s.replace("%0D", "\r");
-  s.replace("%0A", "\n");
+  s.replace("%0A", "\n");//\n
   // s.replace("%09", "\t");
   return s;
 }

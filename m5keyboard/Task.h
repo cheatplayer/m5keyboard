@@ -9,6 +9,7 @@
 #define COMPONENTS_CPP_UTILS_TASK_H_
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include "Arduino.h"
 /**
  * @brief Encapsulate a runnable task.
  *

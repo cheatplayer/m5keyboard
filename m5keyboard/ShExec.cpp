@@ -120,7 +120,6 @@ String Sh::stringify(char key_val){
     if(i==191)return "\r::: LEFT\r";
     if(i==192)return "\r::: DOWN\r";
     if(i==193)return "\r::: RIGHT\r";
-
     return String(key_val);
 }
 
@@ -159,15 +158,14 @@ int Sh::parse(String n){
 
 std::vector<String> Sh::split(String str,char sep){
     std::vector<String> result;
-    String::size_type pos1, pos2;
-    pos2 = str.indexOf(sep);
-    pos1 = 0;
-    while (String::npos != pos2)
+    
+    int pos2 = str.indexOf(sep);
+    int pos1 = 0;
+    while (pos2>=0)
     {
             result.push_back(str.substring(pos1, pos2));
-
             pos1 = pos2 + 1;
-            pos2 = str.find(sep, pos1);
+            pos2 = str.indexOf(sep, pos1);
     }
     result.push_back(str.substring(pos1));
     return result;

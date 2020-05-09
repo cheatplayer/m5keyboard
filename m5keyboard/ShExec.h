@@ -9,6 +9,7 @@
 
 #include "Task.h"
 #include <vector>
+#include "Arduino.h"
 
 namespace Sh{
     String stringify(char key_val);
