@@ -13,7 +13,7 @@
 #include "Display.h"
 #include "M5Client.h"
 #include "Menu.h"
-
+#include "ShExec.h"
 
 bool isSTAConnected=false;
 bool isSTAStarted=false;
@@ -349,8 +349,9 @@ String M5Server::urlDecode(String input) {
   s.replace("%7B", "{");
   s.replace("%7C", "|");
   s.replace("%7D", "}");
-  s.replace("%0D", "\r");
-  s.replace("%0A", "\r");//\n
+  s.replace("%0D", "\0xd");//\r
+  s.replace("%0A", "");//\n
   // s.replace("%09", "\t");
+  
   return s;
 }

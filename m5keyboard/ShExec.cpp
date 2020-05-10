@@ -178,6 +178,7 @@ Exec::Exec(String text){
 void Exec::setSplit(String text){
     lines=Sh::split(text,'\r');
     length=lines.size();
+    
 }
 
 extern void simulateKey(KEYMAP map);
@@ -199,7 +200,11 @@ void Exec::execBLEString(const char *text){
 extern unsigned char modifierkeys;
 
 void Exec::execLine(String line){
-     Serial.println(line.c_str());
+//     Serial.println(line.c_str());
+
+     if((int)line[0]==10){//for server hid script not ^J(10)/^M(13) LF/CR 
+        line=line.substring(1);
+      }
    if(line.substring(0,3)==">>>"){
         std::vector<String> sp=Sh::split(line.substring(4),' ');
         int i=0;
