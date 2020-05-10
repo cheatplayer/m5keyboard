@@ -21,15 +21,24 @@ void Menu::halt(){
 }
 
 String record_str="";
+
 void Menu::record(char key_val){
     if(isclientcmd){
         clientcmd+=key_val;
     }else{
-        int i=(int)key_val;
-        inputKeyValue(i);
+        int k=(int)key_val;
+        inputKeyValue(k);
         String sh=Sh::stringify(key_val);
         record_str+=sh;
         TheClient::sendClient(sh);
+        Display::clear();
+        std::vector<String> record_vec=Sh::split(record_str,'\r');
+        for(int i=0;i<record_vec.size();i=i+1){
+            if(record_vec.size()-i<13){
+                M5.Lcd.setCursor(5,(13-record_vec.size()+i)*18-18);
+                M5.Lcd.print(record_vec[i].c_str());
+            }
+        }
     }
 
 }
@@ -128,8 +137,16 @@ void Menu::load(){
         Display::result("find first");
     }else{
         Menu::clear();
-        record_str=SDCard::read(findname.c_str());
-        M5.Lcd.print(record_str.c_str());
+        record_str=String(SDCard::read(findname.c_str()).c_str());
+//        M5.Lcd.print(record_str.c_str());
+        
+        std::vector<String> vec=Sh::split(record_str,'\r');
+        for(int i=0;i<vec.size();i=i+1){
+            if(i<11){
+                M5.Lcd.setCursor(5,i*18+2);
+                M5.Lcd.print(vec[i].c_str());
+            }
+        }
         Display::result("load ok");
     }
 }

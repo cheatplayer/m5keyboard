@@ -12,6 +12,7 @@ namespace Display{
     void info(const char* info);
     void result(const char* result);
     void print(char c);
+    void readme();
 }
 
 #endif

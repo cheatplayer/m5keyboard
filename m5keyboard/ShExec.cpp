@@ -199,7 +199,7 @@ void Exec::execBLEString(const char *text){
 extern unsigned char modifierkeys;
 
 void Exec::execLine(String line){
-    // Serial.println(line.c_str());
+     Serial.println(line.c_str());
    if(line.substring(0,3)==">>>"){
         std::vector<String> sp=Sh::split(line.substring(4),' ');
         int i=0;

@@ -58,6 +58,7 @@ void setup() {
   Display::menu(menufuncA[menuindex].name);
   Display::info(menufuncB[menuindex].name);
   Display::result("menu");
+  Display::clear();
   SDCard::mount();
   Menu::rels();
 
@@ -88,7 +89,7 @@ void loop() {
     while (Wire.available()) { 
       uint8_t key_val = Wire.read();      
       if(key_val != 0) {
-        Display::print((char)key_val);
+        //Display::print((char)key_val);
         Menu::record((char)key_val);
       }
     }
