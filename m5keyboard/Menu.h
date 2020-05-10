@@ -14,12 +14,23 @@ namespace Menu{
     void clear();
     void save();
     void load();
-    void hack();
-    void hackStop();
+    void runScript();
+    void runScriptStop();
+    void runMenu();
+    void loop();
+    void loopStop();
+    void loopMenu();
     void rm();
     void find();
     void rels();
     void ls();
+    void startSTAMenu();
+    void startAPMenu();
+    void startClientMenu();
+    void stopClientMenu();
+    void stopAll();
+    void clientCmd();
+    void sendClientCmd();
 }
 
 #endif

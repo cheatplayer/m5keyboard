@@ -6,9 +6,7 @@
  */
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <string>
 #include "Task.h"
-// #include "Arduino.h"
 
 
 /**
@@ -18,7 +16,7 @@
  * @param [in] stackSize The size of the stack.
  * @return N/A.
  */
-Task::Task(std::string taskName, uint16_t stackSize, uint8_t priority) {
+Task::Task(String taskName, uint16_t stackSize, uint8_t priority) {
     m_taskName  = taskName;
     m_stackSize = stackSize;
     m_priority  = priority;
@@ -110,7 +108,7 @@ void Task::setPriority(uint8_t priority) {
  * @param [in] name The name for the task.
  * @return N/A.
  */
-void Task::setName(std::string name) {
+void Task::setName(String name) {
     m_taskName = name;
 } // setName
 

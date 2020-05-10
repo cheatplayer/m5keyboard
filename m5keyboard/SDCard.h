@@ -10,16 +10,15 @@
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
-#include <string>
 #include <vector>
 
 namespace SDCard{
     void mount();
 
-    std::vector<std::string> ls(const char *path);
+    std::vector<String> ls(const char *path);
     bool mkdir(const char *path);
     bool rmdir(const char *path);
-    std::string read(const char *path);
+    String read(const char *path);
     bool write(const char *path,const char *message);
     bool append(const char *path,const char *message);
     bool mv(const char *from,const char *to);

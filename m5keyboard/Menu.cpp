@@ -3,29 +3,55 @@
 */
 #include <M5Stack.h>
 #include "Menu.h"
-#include <string>
 #include "Display.h"
 #include "SDCard.h"
 #include "BLEHIDKeyboard.h"
+#include "ShExec.h"
+#include "M5Server.h"
+#include "M5Client.h"
 
 extern bool isConnected;
+extern void inputKeyValue(int key_val);
+extern bool isClientConnected;
+String clientcmd="";
+bool isclientcmd=false;
 
 void Menu::halt(){
     M5.powerOFF();
 }
 
-std::string record_str="";
+String record_str="";
+
 void Menu::record(char key_val){
-    int i=(int)key_val;
-    if(i==8){//backspace
-        record_str+="\b";
-        return;
+    if(isclientcmd){
+        clientcmd+=key_val;
+    }else{
+        int k=(int)key_val;
+        inputKeyValue(k);
+        String sh=Sh::stringify(key_val);
+        record_str+=sh;
+        TheClient::sendClient(sh);
+        Display::clear();
+        std::vector<String> record_vec=Sh::split(record_str,'\r');
+        for(int i=0;i<record_vec.size();i=i+1){
+            if(record_vec.size()-i<13){
+                M5.Lcd.setCursor(5,(13-record_vec.size()+i)*18-18);
+                M5.Lcd.print(record_vec[i].c_str());
+            }
+        }
     }
-    if(i==13){//enter
-        record_str+="\n";
-        return;
-    }
-    record_str+=std::string(1,key_val);
+
+}
+
+void Menu::clientCmd(){
+    clientcmd="";
+    isclientcmd=true;
+}
+
+void Menu::sendClientCmd(){
+    TheClient::sendCmd(clientcmd);
+    clientcmd="";
+    isclientcmd=false;
 }
 
 void Menu::clear(){
@@ -33,20 +59,22 @@ void Menu::clear(){
     record_str="";
 }
 
-std::string savename="";
-std::string savemsg="";
+String savename="";
+String savemsg="";
 void Menu::save(){
     if(savename==""){
         savemsg=record_str;
         Display::info("input file name");
         savename="/";
+        isclientcmd=true;
     }else{
-        savename+=record_str;
+        savename+=clientcmd;
         if(SDCard::write(savename.c_str(),savemsg.c_str())){
             Display::result("save ok");
         }else{
             Display::result("save fail");
         }
+        isclientcmd=false;
         savename="";
         savemsg="";
     }
@@ -54,10 +82,13 @@ void Menu::save(){
     Menu::rels();  
 }
 
-std::string findname="";
-std::vector<std::string> findfiles;
+String findname="";
+std::vector<String> findfiles;
 int findindex=0;
 void Menu::find(){
+    if(findindex==0){
+        Menu::ls();
+    }
     if(findfiles.size()==0){
         return;
     }
@@ -106,25 +137,119 @@ void Menu::load(){
         Display::result("find first");
     }else{
         Menu::clear();
-        record_str=SDCard::read(findname.c_str());
-        M5.Lcd.print(record_str.c_str());
+        record_str=String(SDCard::read(findname.c_str()).c_str());
+//        M5.Lcd.print(record_str.c_str());
+        
+        std::vector<String> vec=Sh::split(record_str,'\r');
+        for(int i=0;i<vec.size();i=i+1){
+            if(i<11){
+                M5.Lcd.setCursor(5,i*18+2);
+                M5.Lcd.print(vec[i].c_str());
+            }
+        }
         Display::result("load ok");
     }
 }
 
-InputTask *hacktask;
-void Menu::hack(){
+Exec *runscripttask;
+void Menu::runScript(){
   if(isConnected){
-    hacktask= new InputTask(record_str.c_str());
-    hacktask->start();
-    Display::result("hacking...");
+    runscripttask= new Exec(record_str);
+    runscripttask->start();
+    Display::result("runing script...");
+  }else if(isClientConnected){
+    TheClient::sendClient(record_str);
   }else{
-    Display::result("hack fail");  
+    Display::result("run script fail");  
   }
 }
 
-void Menu::hackStop(){
-    hacktask->stop();
-    delete hacktask;
-    Display::result("hack stoped");
+void Menu::runScriptStop(){
+    runscripttask->stop();
+    delete runscripttask;
+    Display::result("run script stoped");
+}
+
+bool isRuning=false;
+void Menu::runMenu(){
+    if(isRuning){
+        Menu::runScriptStop();
+        isRuning=false;
+        Display::menu("run");
+    }else{
+        Menu::runScript();
+        isRuning=true;
+        Display::menu("cancel");
+    }
+
+}
+
+void Menu::loop(){
+  if(isConnected){
+    runscripttask= new Exec(record_str);
+    runscripttask->isloop=true;
+    runscripttask->start();
+    Display::result("loop script...");
+  }else if(isClientConnected){
+    TheClient::sendCmd("SAVE m5loop/"+record_str);
+    delay(1000);
+    TheClient::sendCmd("LOOP m5loop/");
+  }else{
+    Display::result("loop script fail");  
+  }
+}
+
+void Menu::loopStop(){
+    if(isConnected){
+        runscripttask->isloop=false;
+        runscripttask->stop();
+        delete runscripttask;
+    }else if(isClientConnected){
+        TheClient::sendCmd("LEND ");
+    }
+    Display::result("loop script stoped");
+}
+
+bool isLooping=false;
+void Menu::loopMenu(){
+    if(isLooping){
+        Menu::loopStop();
+        isLooping=false;
+        Display::info("loop");
+    }else{
+        Menu::loop();
+        isLooping=true;
+        Display::info("cancel");
+    }
+}
+
+void Menu::startSTAMenu(){
+    M5Server::startSTA();
+    CheckServerTask *checkservertask= new CheckServerTask();
+    checkservertask->start();
+    M5Server::startServer();
+}
+
+void Menu::startAPMenu(){
+    M5Server::scanNetworks();
+    M5Server::startAP();
+    M5Server::startServer();
+}
+
+void Menu::startClientMenu(){
+    TheClient::StartHTTPClient("TP-LINK_M5CL","cheatplayer");
+}
+
+extern bool isClientConnected;
+void Menu::stopClientMenu(){
+    M5.Lcd.fillCircle(10,230,3,RED);
+    isClientConnected=false;
+}
+
+extern void StopBLEServer();
+void Menu::stopAll(){
+    M5Server::stopAP();
+    M5Server::stopSTA();
+    Menu::stopClientMenu();
+    StopBLEServer();
 }

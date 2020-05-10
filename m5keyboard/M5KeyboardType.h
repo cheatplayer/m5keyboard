@@ -1,6 +1,9 @@
 /*
  * 2019/1/19 by cp
  */
+#ifndef M5KEYBOARDTYPE_H
+#define M5KEYBOARDTYPE_H
+
 #define KEY_MOD_LCTRL  0x01
 #define KEY_MOD_LSHIFT 0x02
 #define KEY_MOD_LALT   0x04
@@ -9,6 +12,19 @@
 #define KEY_MOD_RSHIFT 0x20
 #define KEY_MOD_RALT   0x40
 #define KEY_MOD_RMETA  0x80
+
+enum MODIFIER_KEY {
+    KEY_CTRL = 1,
+    KEY_SHIFT = 2,
+    KEY_ALT = 4,
+};
+
+typedef struct {
+    unsigned char usage;
+    unsigned char modifier;
+} KEYMAP;
+
+
 
 const KEYMAP m5keymap[194]={
     {0,0},
@@ -165,25 +181,25 @@ const KEYMAP m5keymap[194]={
     {0,KEY_MOD_RSHIFT},
     {0,KEY_MOD_RALT},
     {0,KEY_MOD_RMETA},/* p alt 153*/
-    {0x3a,0},/* a alt */
+    {0x3a,0},/* a alt f1*/
     {0x3b,0},
     {0x3c,0},
     {0x3d,0},
     {0x3e,0},
     {0x3f,0},
     {0x40,0},
-    {0x41,0},
-    {0,0},
-    {0,0},/* enter alt*/
-    {0x42,0},
-    {0x43,0},/* x alt*/
+    {0x41,0},/*f8 161*/
+    {0x42,0},/**/
+    {0,0},/* enter alt CRLF*/
+    {0x42,0},/*f9 no*/
+    {0x43,0},/*f10 x alt*/
     {0x44,0},
-    {0x45,0},
+    {0x45,0},/*f12*/
     {0,0},
     {0,0},
     {0,0},
     {0,0},
-    {0,0},/*$ alt*/
+    {0,0},/*$ alt delay*/
     {0,0},
     {0,0},
     {0x29,0},/* alt 0 esc*/
@@ -242,3 +258,4 @@ const uint8_t reportMap[] = {
   HIDINPUT(1),           0x00,       //   Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position
   END_COLLECTION(0)
 };
+#endif
