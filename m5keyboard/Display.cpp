@@ -30,7 +30,7 @@ const String README[11]={
   " #    1    2    3    (    )    _    -    +    @  ",
   "~ q  ^ w  & e  ` r  < t  > y  { u   } i  [ o  ] p",
   "--------------------------------------------------",
-  "F1   F2   F3   F4   F5  F6  F7   F8  F9",
+  "F1   F2   F3   F4   F5  F6  F7   F8  F9  clr",
   "                      PS   SL  CL   ^   INS  DEL",
   "|*a  =4s  \\5d  %6f  / g  : h  ; j   ' k  \"  l   BS",
   "--------------------------------------------------",
@@ -38,6 +38,7 @@ const String README[11]={
   "      TAB HOM END  PU   PD  <    v    > ",
   "ALT  7 z  8 x  9 c  ? v  ! b  , n  . m    $   LF"
   };
+
 
 void Display::init(){
     M5.Lcd.setTextFont(2);
@@ -107,7 +108,6 @@ int cursor_y=2;
 
 void Display::clear(){
     M5.Lcd.fillRect(0,0,320,220,BLACK);
-    Display::readme();
     cursor_y=2;
     cursor_x=5;
     M5.Lcd.setCursor(cursor_x,cursor_y);

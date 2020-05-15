@@ -237,7 +237,7 @@ void Menu::startAPMenu(){
 }
 
 void Menu::startClientMenu(){
-    TheClient::StartHTTPClient("TP-LINK_M5CL","cheatplayer");
+    TheClient::StartHTTPClient("M5CL","cheatplayer");
 }
 
 extern bool isClientConnected;

@@ -25,7 +25,7 @@ bool isrecord_press=false;
 String record_press="";
 String Sh::stringify(char key_val){
     int i=(int)key_val;
-    if(isrecord_press&&i==176){
+    if(isrecord_press&&(i==176||i==163)){
         record_press="";
         isrecord_press=false;
         return "";

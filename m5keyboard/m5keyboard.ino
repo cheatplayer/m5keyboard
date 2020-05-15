@@ -79,6 +79,7 @@ void loop() {
     if(menuindex >= MENULEN){
         menuindex=0;
     }
+    Display::readme();
     Display::menu(menufuncA[menuindex].name);
     Display::info(menufuncB[menuindex].name);
     Display::result("menu");
