@@ -1,6 +1,6 @@
 # M5KeyBoard
 
-**M5Stack Bluetooth Keyboard**
+**M5Stack Face Bluetooth Keyboard and HID Script Keyboard**
 
 2020/5/10 by cp
 
