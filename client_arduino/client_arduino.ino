@@ -5,10 +5,9 @@
 #include "Keyboard.h"
 #include <SPI.h>
 #include <SD.h>
-#include <ArduinoSTL.h>
 #include "SDCard.h"
 
-std::string DEFAULT_FILE_NAME = "bad_usb_default";
+String DEFAULT_FILE_NAME = "default";
 int defaultDelay = 10;
 
 #define ExternSerial Serial1
@@ -26,7 +25,7 @@ void setup(){
         digitalWrite(LED_BUILTIN,LOW);
     }
 
-    delay(10000);
+    delay(5000);
     
     bool dfresult=exec(DEFAULT_FILE_NAME.c_str());
 
@@ -41,61 +40,61 @@ int repeattimes=0;
 String loopfilename="";
 
 void loop(){
-    if(ExternSerial.available()) {
-        originStr = ExternSerial.readStringUntil(255);
-        Serial.println(originStr); 
-        if(originStr[0]=='\001'){
-            cmd();
-            originStr = "";
-        }else{
-            bufferStr = originStr;
-            if(recordfilename!=""){
-                SDCard::append(recordfilename.c_str(),originStr.c_str());
-            }
-            originStr = "";
-        }
-    }
+    // if(ExternSerial.available()) {
+    //     originStr = ExternSerial.readStringUntil(255);
+    //     Serial.println(originStr); 
+    //     if(originStr[0]=='\001'){
+    //         cmd();
+    //         originStr = "";
+    //     }else{
+    //         bufferStr = originStr;
+    //         if(recordfilename!=""){
+    //             SDCard::append(recordfilename.c_str(),originStr.c_str());
+    //         }
+    //         originStr = "";
+    //     }
+    // }
   
-    if(bufferStr.length() > 0){
-        while(bufferStr.length() > 0){
-            int latest_return = bufferStr.indexOf("\r");
-            if(latest_return == -1){
-                Serial.println("run: "+bufferStr);
-                execLine(bufferStr);
-                bufferStr = "";
-            } else{
-                Serial.println("run: '"+bufferStr.substring(0, latest_return)+"'");
-                execLine(bufferStr.substring(0, latest_return));
-                last=bufferStr.substring(0, latest_return);
-                bufferStr = bufferStr.substring(latest_return + 1);
-            }
-        }
-        bufferStr = "";
-        ExternSerial.write(0x04);
-        Serial.println("done");
-    }
+    // if(bufferStr.length() > 0){
+    //     while(bufferStr.length() > 0){
+    //         int latest_return = bufferStr.indexOf("\r");
+    //         if(latest_return == -1){
+    //             Serial.println("run: "+bufferStr);
+    //             execLine(bufferStr);
+    //             bufferStr = "";
+    //         } else{
+    //             Serial.println("run: '"+bufferStr.substring(0, latest_return)+"'");
+    //             execLine(bufferStr.substring(0, latest_return));
+    //             last=bufferStr.substring(0, latest_return);
+    //             bufferStr = bufferStr.substring(latest_return + 1);
+    //         }
+    //     }
+    //     bufferStr = "";
+    //     ExternSerial.write(0x04);
+    //     Serial.println("done");
+    // }
 
-    if(repeatfilename!="" && repeattimes>0){
-        exec(repeatfilename.c_str());
-        repeattimes--;
-    }
+    // if(repeatfilename!="" && repeattimes>0){
+    //     exec(repeatfilename.c_str());
+    //     repeattimes--;
+    // }
 
-    if(loopfilename!=""){
-        exec(loopfilename.c_str());
-    }
+    // if(loopfilename!=""){
+    //     exec(loopfilename.c_str());
+    // }
 }
 
-String parseCmd(String s,char s,char e){
-    return s.substring(s.indexOf(s),s.indexOf(e));
+String parseCmd(String s,String b,String e){
+    return s.substring(s.indexOf(b),s.indexOf(e));
 }
 
 void cmd(){
     // "\001CMD\002NAME\003DATA\004"
-    String cmd=parseCmd(originStr,'\001','\002');
+    String cmd=parseCmd(originStr,"\001","\002");
     Serial.println(cmd);
-    String filename=parseCmd(originStr,'\002','\003');
+    String filename=parseCmd(originStr,"\002","\003");
     Serial.println(filename);
-    String data=parseCmd(originStr,'\003','\004');
+    String data=parseCmd(originStr,"\003","\004");
     if(cmd=="RMRM"){
         bool rmresult=SDCard::rm(filename.c_str());
         if(!rmresult){
@@ -125,10 +124,10 @@ void cmd(){
         repeatfilename="";
         repeattimes=0;
     }else if(cmd=="READ"){
-        std::string readtext=SDCard::read(filename.c_str());
-        ExternSerial.write(("\001READ\002"+filename+"\003"+readtext+"\004").c_str());
+        String readtext=SDCard::read(filename.c_str());
+        ExternSerial.write(("\001READ\002"+filename+"\003"+readtext.c_str()+"\004").c_str());
     }else if(cmd=="LSLS"){
-        std::string lstext=SDCard::lsStr("/");
+        String lstext=SDCard::ls("/");
         ExternSerial.write(("\001LSLS\002ROOT\003"+lstext+"\004").c_str());
     }else if(cmd=="CMSG"){
         Serial.print("msg: ");
@@ -140,9 +139,10 @@ bool exec(const char *filename){
     digitalWrite(LED_BUILTIN,HIGH);
     File f=SD.open(filename);
     if(f){
-        std::string line="";
+        String line="";
         while(f.available()){
             char k=f.read();
+            Serial.print(k);
             if(k=='\r'){
                 execLine(line);
                 line="";
@@ -155,34 +155,38 @@ bool exec(const char *filename){
         digitalWrite(LED_BUILTIN,LOW);
         return true;
     }else{
+        Serial.println("no default script");
+        Serial.println(SDCard::ls("/"));
         return false;
     }
 }
 
-void execLine(String line){
+/*
+String to std::string
     const char *temp = const_cast<char*>(line.c_str());
     std::string t=temp;
-    execLine(t);
-}
+*/
 
-void execLine(std::string line){
+void execLine(String line){
     //delay(defaultDelay);
-    if(line.substr(0,3)==">>>"){
-        std::vector<std::string> sp=split(line.substr(4),' ');
-        int i=0;
-        while(i<sp.size()){
-            int key=parse(sp[i]);
+    if(line.substring(0,3)==">>>"){
+        String t=line.substring(4);
+        while(t.indexOf(" ")!=-1){
+            Serial.println(t.substring(0,t.indexOf(" ")));
+            int key=parse(t.substring(0,t.indexOf(" ")));
             Keyboard.press(key);
-            i++;
+            t=t.substring(t.indexOf(" ")+1);
         }
+        Serial.print(t);
+        Keyboard.press(parse(t));
         delay(defaultDelay);
         Keyboard.releaseAll();
         delay(defaultDelay);
-    }else if(line.substr(0,3)=="$$$"){
-        int n=atoi(line.substr(4).c_str());
+    }else if(line.substring(0,3)=="$$$"){
+        int n=atoi(line.substring(4).c_str());
         delay(n);
-    }else if(line.substr(0,3)==":::"){
-        int key=parse(line.substr(4));
+    }else if(line.substring(0,3)==":::"){
+        int key=parse(line.substring(4));
         Keyboard.press(key);
         delay(defaultDelay);
         Keyboard.release(key);
@@ -192,29 +196,14 @@ void execLine(std::string line){
         Keyboard.press(key);
         Keyboard.releaseAll();
     }else{
-        Keyboard.write(line.c_str(),line.size());
+        Keyboard.write(line.c_str(),line.length());
         delay(defaultDelay);
         Keyboard.releaseAll();
         delay(defaultDelay);
     }
 }
 
-std::vector<std::string> split(std::string str,char sep){
-    std::vector<std::string> result;
-    std::string::size_type pos1, pos2;
-    pos2 = str.find(sep);
-    pos1 = 0;
-    while (std::string::npos != pos2)
-    {
-        result.push_back(str.substr(pos1, pos2 - pos1));
-        pos1 = pos2 + 1;
-        pos2 = str.find(sep, pos1);
-    }
-    result.push_back(str.substr(pos1));
-    return result;
-}
-
-int parse(std::string n){
+int parse(String n){
     if(n=="ENTER")return 0xB0;
     if(n=="LCTRL"||n=="CTRL")return 0x80;
     if(n=="LSHIFT"||n=="SHIFT")return 0x81;

@@ -4,6 +4,10 @@
 
 2020/5/10 by cp
 
+### Hardware
+
+m5stack fire(esp32) and face
+use Arduino IDE
 
 ![](http://davidkingzyb.github.io/blogmd/blogImg/m5keyboard.JPG)
 
@@ -77,7 +81,7 @@
        +------+----+-------------------+----+------+
 ```
 
-### HID Script
+## HID Script
 
 line split by `\r`
 

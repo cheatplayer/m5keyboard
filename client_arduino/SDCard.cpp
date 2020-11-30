@@ -2,8 +2,8 @@
 #include "SDCard.h"
 #include <SD.h>
 
-std::string SDCard::read(const char *path){
-    std::string result="";
+String SDCard::read(const char *path){
+    String result="";
     File f=SD.open(path);
     if(f){
         while(f.available()){
@@ -46,42 +46,21 @@ bool SDCard::rm(const char *path){
     }
 }
 
-std::vector<std::string> SDCard::ls(const char *path){
-    std::vector<std::string> v;
+String SDCard::ls(const char *path){
+    String r="";
     File root = SD.open(path);
     if(!root||!root.isDirectory()){
-        return v;
+        return r;
     }
     File file=root.openNextFile();
     while(file){
-        std::string filename=file.name();
+        String filename=file.name();
         if(file.isDirectory()){
-            // v.push_back(filename+"/");
         }else{
-            v.push_back(filename);
+            r+=filename+"\r";
         }
         file=root.openNextFile();
     }
     root.close();
-    return v;
-}
-
-std::string SDCard::lsStr(const char *path){
-    std::string v="";
-    File root = SD.open(path);
-    if(!root||!root.isDirectory()){
-        return v;
-    }
-    File file=root.openNextFile();
-    while(file){
-        std::string filename=file.name();
-        if(file.isDirectory()){
-            // v.push_back(filename+"/");
-        }else{
-            v+=filename+"\n";
-        }
-        file=root.openNextFile();
-    }
-    root.close();
-    return v;
+    return r;
 }

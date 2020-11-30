@@ -1,7 +1,17 @@
-# client
+# M5Keyboard Client
+
+**M5Keyboard's client or a bad usb**
 
 2020 by cp
 
+### Hardware
+
+CJMCU badusb(arduino leonardo and esp8266)
+use Arduino IDE
+
+## Serial package 
+
+max length 255
 
 `\001CMD\002NAME\003DATA\004`
 
