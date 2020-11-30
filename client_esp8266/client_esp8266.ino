@@ -6,13 +6,12 @@
 #include <SPIFFSEditor.h>
 #include <EEPROM.h>
 
-
 #define BAUD_RATE 57200
 #define bufferSize 600
 #define debug false
 
 /* ============= CHANGE WIFI CREDENTIALS ============= */
-const char *ssid = "TP-LINK_M5CL";
+const char *ssid = "M5CL";
 const char *password = "cheatplayer"; //min 8 chars
 /* ============= ======================= ============= */
 
@@ -20,25 +19,14 @@ String lstext="";
 String readtext="";
 
 AsyncWebServer server(80);
-FSInfo fs_info;
 
 bool shouldReboot = false;
-
-//Script stuff
-bool runLine = false;
-bool runScript = false;
-File script;
-
-uint8_t scriptBuffer[bufferSize];
-uint8_t scriptLineBuffer[bufferSize];
-int bc = 0; //buffer counter
-int lc = 0; //line buffer counter
 
 void setup() {
   
   Serial.begin(BAUD_RATE);
   delay(2000);
-  if(debug) Serial.println("\nstarting...\nSSID: "+ (String)ssid +"\nPassword: "+ (String)password);
+  if(debug) sendCmd("CMSG","8266","starting SSID: "+ (String)ssid +" Password: "+ (String)password);
 
   EEPROM.begin(4096);
   SPIFFS.begin();
@@ -46,41 +34,96 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.softAP(ssid, password,1, false);
   
+  StartServer();
+}
+
+void loop() {
+  if(shouldReboot) ESP.restart();
+  
+  if(Serial.available()) {
+    uint8_t answer = Serial.read();
+    if(answer == 0x04) {
+      if(debug) sendCmd("CMSG","8266","8266 done");
+      runLine = true;
+    }
+    else {
+        String originStr = (char)answer + Serial.readStringUntil(255);
+        if(originStr[0]=='\001') {
+            String cmd=parseCmd(originStr,'\001','\002');
+            String filename=parseCmd(originStr,'\002','\003');
+            String data=parseCmd(originStr,'\003','\004');
+            if(cmd=="READ"){
+                readtext=data;
+            }else if(cmd=="LSLS"){
+                lstext=data;
+            }
+        }
+    }
+  }
+
+}
+
+
+void StartServer(){
   // ===== WebServer ==== //
   MDNS.addService("http","tcp",80);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
       String body="<h1>M5Client</h1>";
+
       body+="<form method='post' name='fn'>";
-      body+="<button onclick=\"fn.action='/sdls';fn.submit()\">ls</button><br>";
+      body+="<button onclick=\"fn.action='/sdls';fn.submit()\">ls tap2</button><br>";
       body+="<button onclick=\"fn.action='/restart';fn.submit()\">restart</button><br>";
-      body+="</form>";
+      body+="</form><hr>";
+
+      body+="<form method='post' name='fq'>";
+      body+="<textarea rows='20' name='q'></textarea><br>";
+      body+="<button onclick=\"fq.action='/input';fq.submit()\">input</button><br>";
+      body+="</form><hr>";
+
       body+="<form method='post' name='f'>";
       body+="<input type='text' name='filename'><br>";
-      body+="<button onclick=\"f.action='/sdread';f.submit()\">read</button>";
-      body+="<button onclick=\"f.action='/sdload';f.submit()\">load</button>";
+      body+="<button onclick=\"f.action='/sdread';f.submit()\">read tap2</button>";
+      body+="<button onclick=\"f.action='/sdload';f.submit()\">load exec</button>";
       body+="<button onclick=\"f.action='/sdrm';f.submit()\">rm</button><br>";
       body+="<button onclick=\"f.action='/record';f.submit()\">record</button>";
       body+="<button onclick=\"f.action='/recordend';f.submit()\">record end</button><br>";
       body+="<button onclick=\"f.action='/loop';f.submit()\">loop</button>";
       body+="<button onclick=\"f.action='/loopend';f.submit()\">loop end</button><br>";
+
+      body+="<input type='text' name='times'><br>";
+      body+="<button onclick=\"f.action='/repeat';f.submit()\">repeat</button>";
+      body+="<button onclick=\"f.action='/loopend';f.submit()\">repeat end</button><br>";
+
       body+="<textarea rows='20' name='text'></textarea><br>";
       body+="<button onclick=\"f.action='/sdsave';f.submit()\">save</button><br>";
-      body+="<input type='text' name='times'><br>";
-      body+="<button onclick=\"f.action='/repeat';f.submit()\">repeat</button><br>";
-      body+="</form>";
-      body+="<form method='post' name='fq'>";
-      body+="<textarea rows='20' name='q'></textarea><br>";
-      body+="<button onclick=\"fq.action='/cmd';fq.submit()\">cmd</button>";
-      body+="<button onclick=\"fq.action='/input';fq.submit()\">input</button>";
-      body+="</form>";
-	  AsyncWebServerResponse *response = request->beginResponse(200, "text/html", makePage("M5Client",body));
-	  request->send(response);
+
+      body+="</form><hr>";
+
+      body+="<form method='post' name='fc'>";
+      body+="<input type='text' name='cmd'><br>";
+      body+="<input type='text' name='filename'><br>";
+      body+="<textarea rows='20' name='data'></textarea><br>";
+      body+="<button onclick=\"fc.action='/cmd';fc.submit()\">cmd</button><br>";
+      body+="</form><hr>";
+
+      AsyncWebServerResponse *response = request->beginResponse(200, "text/html", makePage("M5Client",body));
+      request->send(response);
   });
 
   server.on("/cmd",HTTP_POST,[](AsyncWebServerRequest *request){
-    String q=request->arg("q");
-    Serial.print("^B$ "+q);
+    String cmd=request->arg("cmd");
+    String filename=request->arg("filename");
+    String data=request->arg("data");
+    sendCmd(cmd,filename,data);
+    request->send(200, "text/plain", q);
+  });
+
+  server.on("/cmd",HTTP_GET,[](AsyncWebServerRequest *request){
+    String cmd=request->arg("cmd");
+    String filename=request->arg("filename");
+    String data=request->arg("data");
+    sendCmd(cmd,filename,data);
     request->send(200, "text/plain", q);
   });
 
@@ -99,50 +142,49 @@ void setup() {
   server.on("/sdsave",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     String text=request->arg("text");
-    Serial.println("^B$ SAVE "+filename+"/"+text);
+    sendCmd("SAVE",filename,text);
     request->send(200, "text/plain", filename+"/"+text);
   });
 
   server.on("/sdload",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
-    Serial.println("^B$ LOAD "+filename+"/");
+    sendCmd("LOAD",filename,"");
     request->send(200, "text/plain", filename);
   });
 
   server.on("/sdrm",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
-    Serial.println("^B$ RMRM "+filename+"/");
+    sendCmd("RMRM",filename,"");
     request->send(200, "text/plain", filename);
   });
 
   server.on("/record",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
-    Serial.println("^B$ RECD "+filename+"/");
+    sendCmd("RECD",filename,"");
     request->send(200, "text/plain", filename);
   });
 
   server.on("/recordend",HTTP_POST,[](AsyncWebServerRequest *request){
-    Serial.println("^B$ REND ");
+    sendCmd("REND","","");
     request->send(200, "text/plain", "recordend");
   });
 
   server.on("/repeat",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
     String times=request->arg("times");
-    Serial.println("^B$ REPT "+filename+"/"+times+"/");
+    sendCmd("REPT",filename,times);
     request->send(200, "text/plain", filename+"/"+times);
   });
 
   server.on("/loop",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
-    Serial.println("^B$ LOOP "+filename+"/");
+    sendCmd("LOOP",filename,"");
     request->send(200, "text/plain", filename);
   });
 
   server.on("/loopend",HTTP_POST,[](AsyncWebServerRequest *request){
-    String filename=request->arg("filename");
-    Serial.println("^B$ LEND "+filename+"/");
-    request->send(200, "text/plain", filename);
+    sendCmd("LEND","","");
+    request->send(200, "text/plain", "loopend");
   });
 
   server.on("/sdread",HTTP_POST,[](AsyncWebServerRequest *request){
@@ -163,13 +205,12 @@ void setup() {
 
   server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
       request->send(200, "text/plain", "true");
-	  shouldReboot = true;
+      shouldReboot = true;
   });
-
 
   server.begin();
   
-  if(debug) Serial.println("started");
+  if(debug) sendCmd("CMSG","8266","server started");
 }
 
 String makePage(String title, String contents) {
@@ -189,58 +230,10 @@ void jumpPath(AsyncWebServerRequest *request,String path){
   request->send(response);
 }
 
-void sendBuffer(){
-  for(int i=0;i<bc;i++) Serial.write((char)scriptBuffer[i]);
-  runLine = false;
-  bc = 0;
+void sendCmd(String cmd,String name,String data){
+    Serial.print("\001"+cmd+"\002"+name+"\003"+data+"\004");
 }
 
-void addToBuffer(){
-  if(bc + lc > bufferSize) sendBuffer();
-  for(int i=0;i<lc;i++){
-    scriptBuffer[bc] = scriptLineBuffer[i];
-    bc++;
-  }
-  lc = 0;
-}
-
-void loop() {
-  if(shouldReboot) ESP.restart();
-  
-  if(Serial.available()) {
-    uint8_t answer = Serial.read();
-    if(answer == 0x99) {
-      if(debug) Serial.println("done");
-      runLine = true;
-	}
-	else {
-		String originStr = (char)answer + Serial.readStringUntil(255);
-        String tag=originStr.substring(0,3);
-		if( tag== "^B$") {
-            String cmd=originStr.substring(4,8);
-            String query=originStr.substring(9);
-            if(cmd=="READ"){
-                readtext=query;
-            }else if(cmd=="LSLS"){
-                lstext=query;
-            }
-		}
-	}
-  }
-
-  if(runScript && runLine){
-    if(script.available()){
-      uint8_t nextChar = script.read();
-	  if(debug) Serial.write(nextChar);
-      scriptLineBuffer[lc] = nextChar;
-      lc++;
-      if(nextChar == 0x0D || lc == bufferSize) addToBuffer();
-    }else{
-      addToBuffer();
-      if(bc > 0) sendBuffer();
-      runScript = false;
-      script.close();
-    }
-  }
-
+String parseCmd(String s,char s,char e){
+    return s.substring(s.indexOf(s),s.indexOf(e));
 }
