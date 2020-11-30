@@ -40,52 +40,52 @@ int repeattimes=0;
 String loopfilename="";
 
 void loop(){
-    // if(ExternSerial.available()) {
-    //     originStr = ExternSerial.readStringUntil(255);
-    //     Serial.println(originStr); 
-    //     if(originStr[0]=='\001'){
-    //         cmd();
-    //         originStr = "";
-    //     }else{
-    //         bufferStr = originStr;
-    //         if(recordfilename!=""){
-    //             SDCard::append(recordfilename.c_str(),originStr.c_str());
-    //         }
-    //         originStr = "";
-    //     }
-    // }
+    if(ExternSerial.available()) {
+        originStr = ExternSerial.readStringUntil(255);
+        Serial.println(originStr); 
+        if(originStr[0]=='\001'){
+            cmd();
+            originStr = "";
+        }else{
+            bufferStr = originStr;
+            if(recordfilename!=""){
+                SDCard::append(recordfilename.c_str(),originStr.c_str());
+            }
+            originStr = "";
+        }
+    }
   
-    // if(bufferStr.length() > 0){
-    //     while(bufferStr.length() > 0){
-    //         int latest_return = bufferStr.indexOf("\r");
-    //         if(latest_return == -1){
-    //             Serial.println("run: "+bufferStr);
-    //             execLine(bufferStr);
-    //             bufferStr = "";
-    //         } else{
-    //             Serial.println("run: '"+bufferStr.substring(0, latest_return)+"'");
-    //             execLine(bufferStr.substring(0, latest_return));
-    //             last=bufferStr.substring(0, latest_return);
-    //             bufferStr = bufferStr.substring(latest_return + 1);
-    //         }
-    //     }
-    //     bufferStr = "";
-    //     ExternSerial.write(0x04);
-    //     Serial.println("done");
-    // }
+    if(bufferStr.length() > 0){
+        while(bufferStr.length() > 0){
+            int latest_return = bufferStr.indexOf("\r");
+            if(latest_return == -1){
+                Serial.println("run: "+bufferStr);
+                execLine(bufferStr);
+                bufferStr = "";
+            } else{
+                Serial.println("run: '"+bufferStr.substring(0, latest_return)+"'");
+                execLine(bufferStr.substring(0, latest_return));
+                last=bufferStr.substring(0, latest_return);
+                bufferStr = bufferStr.substring(latest_return + 1);
+            }
+        }
+        bufferStr = "";
+        ExternSerial.write(0x04);
+        Serial.println("done");
+    }
 
-    // if(repeatfilename!="" && repeattimes>0){
-    //     exec(repeatfilename.c_str());
-    //     repeattimes--;
-    // }
+    if(repeatfilename!="" && repeattimes>0){
+        exec(repeatfilename.c_str());
+        repeattimes--;
+    }
 
-    // if(loopfilename!=""){
-    //     exec(loopfilename.c_str());
-    // }
+    if(loopfilename!=""){
+        exec(loopfilename.c_str());
+    }
 }
 
 String parseCmd(String s,String b,String e){
-    return s.substring(s.indexOf(b),s.indexOf(e));
+    return s.substring(s.indexOf(b)+1,s.indexOf(e));
 }
 
 void cmd(){
@@ -125,10 +125,11 @@ void cmd(){
         repeattimes=0;
     }else if(cmd=="READ"){
         String readtext=SDCard::read(filename.c_str());
+        Serial.println(readtext);
         ExternSerial.write(("\001READ\002"+filename+"\003"+readtext.c_str()+"\004").c_str());
     }else if(cmd=="LSLS"){
-        String lstext=SDCard::ls("/");
-        ExternSerial.write(("\001LSLS\002ROOT\003"+lstext+"\004").c_str());
+        String lstext=SDCard::ls(filename.c_str());
+        ExternSerial.write(("\001LSLS\002"+filename+"\003"+lstext+"\004").c_str());
     }else if(cmd=="CMSG"){
         Serial.print("msg: ");
         Serial.println(data);

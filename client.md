@@ -4,10 +4,35 @@
 
 2020 by cp
 
+### wifi
+
+SSID: M5CL
+password: cheatplayer
+
+home page: http://192.168.4.1/
+
+
 ### Hardware
 
 CJMCU badusb(arduino leonardo and esp8266)
 use Arduino IDE
+
+and a usb-ttl for upload code to esp8266
+
+```
+  |--|                @   @   @   @   @   @
+  @  @               
+
+
+
+
+        -------     
+        | btn |       ?   ?   Tx  Rx  5v  GND 
+        -------       @   @   @   @   @   @
+         press                |   |   |   |
+                              Rx  Tx
+                              ---usb-ttl---
+```
 
 ## Serial package 
 

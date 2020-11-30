@@ -44,7 +44,6 @@ void loop() {
     uint8_t answer = Serial.read();
     if(answer == 0x04) {
       if(debug) sendCmd("CMSG","8266","8266 done");
-      runLine = true;
     }
     else {
         String originStr = (char)answer + Serial.readStringUntil(255);
@@ -116,7 +115,7 @@ void StartServer(){
     String filename=request->arg("filename");
     String data=request->arg("data");
     sendCmd(cmd,filename,data);
-    request->send(200, "text/plain", q);
+    request->send(200, "text/plain", cmd);
   });
 
   server.on("/cmd",HTTP_GET,[](AsyncWebServerRequest *request){
@@ -124,7 +123,7 @@ void StartServer(){
     String filename=request->arg("filename");
     String data=request->arg("data");
     sendCmd(cmd,filename,data);
-    request->send(200, "text/plain", q);
+    request->send(200, "text/plain", cmd);
   });
 
   server.on("/input",HTTP_POST,[](AsyncWebServerRequest *request){
@@ -189,12 +188,12 @@ void StartServer(){
 
   server.on("/sdread",HTTP_POST,[](AsyncWebServerRequest *request){
     String filename=request->arg("filename");
-    Serial.println("^B$ READ "+filename+"/");
+    sendCmd("READ",filename,"");
     request->send(200, "text/plain", readtext);
   });
 
   server.on("/sdls",HTTP_POST,[](AsyncWebServerRequest *request){
-    Serial.println("^B$ LSLS ");
+    sendCmd("LSLS","/","");
     request->send(200, "text/plain", lstext);
   });
 
@@ -234,6 +233,6 @@ void sendCmd(String cmd,String name,String data){
     Serial.print("\001"+cmd+"\002"+name+"\003"+data+"\004");
 }
 
-String parseCmd(String s,char s,char e){
-    return s.substring(s.indexOf(s),s.indexOf(e));
+String parseCmd(String s,char b,char e){
+    return s.substring(s.indexOf(b)+1,s.indexOf(e));
 }

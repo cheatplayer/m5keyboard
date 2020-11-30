@@ -7,7 +7,7 @@ String SDCard::read(const char *path){
     File f=SD.open(path);
     if(f){
         while(f.available()){
-            result+=f.read();
+            result+=(char)f.read();
         }
         f.close();
     }
